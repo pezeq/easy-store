@@ -1,12 +1,13 @@
 import { Router } from "express";
 import productController from "../controllers/productController";
+import { asyncHandler } from "../middlewares";
 
 const productRouter: Router = Router();
 
-productRouter.get("/", productController.getAll);
-productRouter.get("/:id", productController.getOne);
-productRouter.post("/", productController.createNew);
-productRouter.delete("/:id", productController.deleteOne);
-productRouter.delete("/", productController.deleteAll);
+productRouter.get("/", asyncHandler(productController.getAll));
+productRouter.get("/:id", asyncHandler(productController.getOne));
+productRouter.post("/", asyncHandler(productController.createNew));
+productRouter.delete("/:id", asyncHandler(productController.deleteOne));
+productRouter.delete("/", asyncHandler(productController.deleteAll));
 
 export default productRouter;

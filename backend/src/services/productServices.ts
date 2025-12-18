@@ -11,8 +11,6 @@ const getOne = (id: string): Promise<IProduct | null> => {
 const createNew = (product: Partial<IProduct>): Promise<IProduct> => {
 	const newProduct = new Product({
 		...product,
-		createdAt: new Date(),
-		updatedAt: new Date(),
 	});
 
 	return newProduct.save();

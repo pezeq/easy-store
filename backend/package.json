@@ -4,9 +4,9 @@
 	"description": "",
 	"main": "index.ts",
 	"scripts": {
-		"start": "tsx src/index.ts",
-		"dev": "npm run check && tsx --watch src/index.ts",
-		"test": "echo \"Error: no test specified\" && exit 1",
+		"start": "cross-env NODE_ENV=production tsx src/index.ts",
+		"dev": "cross-env NODE_ENV=development npm run check && tsx --watch src/index.ts",
+		"test": "cross-env NODE_ENV=test echo \"Error: no test specified\" && exit 1",
 		"format": "npx @biomejs/biome format --write",
 		"lint": "npx @biomejs/biome lint --write",
 		"check": "npx @biomejs/biome check --write"
@@ -25,6 +25,7 @@
 		"@types/dotenv": "^6.1.1",
 		"@types/express": "^5.0.6",
 		"@types/node": "^25.0.2",
+		"cross-env": "^10.1.0",
 		"tsx": "^4.21.0",
 		"typescript": "^5.9.3"
 	}
