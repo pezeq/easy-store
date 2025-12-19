@@ -6,7 +6,11 @@ const unknownEndpoint = (
 	_res: Response,
 	next: NextFunction
 ): void => {
-	next(new NotFoundError(`The endpoint '${req.originalUrl}' was not found!`));
+	next(
+		new NotFoundError(
+			`The route '${req.method} ${req.path}' was not found!`
+		)
+	);
 };
 
 export default unknownEndpoint;

@@ -27,6 +27,14 @@
 		"enabled": true,
 		"rules": {
 			"recommended": true,
+			"correctness": {
+				"noUnusedVariables": {
+					"level": "error",
+					"options": {
+						"ignoreRestSiblings": true
+					}
+				}
+			},
 			"suspicious": {
 				"noDoubleEquals": "error"
 			},

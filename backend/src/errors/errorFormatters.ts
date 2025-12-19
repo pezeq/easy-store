@@ -18,7 +18,7 @@ export const formatErrorLog = (err: AppError): ErrorLog => {
 		name: err.name,
 		message: err.message,
 		statusCode: err.statusCode,
-		isOperational: err.isOperational,
+		isOperational: err.isOperational ? err.isOperational : false,
 		stack: err.stack,
 		timestamp: new Date().toISOString(),
 	};
