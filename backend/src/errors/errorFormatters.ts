@@ -36,6 +36,9 @@ export const formatErrorResponse = (err: AppError): ErrorResponse => {
 			case "MongoServerError":
 			case "ValidationError":
 				return 400;
+			case "JsonWebTokenError":
+			case "TokenExpiredError":
+				return 401;
 			default:
 				return 500;
 		}
@@ -70,6 +73,10 @@ export const formatErrorResponse = (err: AppError): ErrorResponse => {
 
 				return undefined;
 			}
+			case "JsonWebTokenError":
+				return "Your request has a invalid token";
+			case "TokenExpiredError":
+				return "Your token has been expired";
 			default:
 				return undefined;
 		}

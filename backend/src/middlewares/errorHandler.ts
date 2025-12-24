@@ -1,4 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
+import jwt from "jsonwebtoken";
 import { MongoServerError } from "mongodb";
 import { MongooseError } from "mongoose";
 import type { AppError } from "../errors/AppError";
@@ -17,6 +18,7 @@ const errorHandler = (
 		isMongooseError: err instanceof MongooseError,
 		isMongoDbError: err instanceof MongoServerError,
 		isSyntaxError: err.name === "SyntaxError",
+		isJsonWebTokenError: err instanceof jwt.JsonWebTokenError,
 	};
 
 	const isOperationalError = Object.values(operationalFlags).some(Boolean);
