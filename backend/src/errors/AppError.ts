@@ -3,6 +3,7 @@ export class AppError extends Error {
 	public readonly isOperational: boolean;
 	public readonly path?: string;
 	public readonly value?: string;
+	public readonly code?: number | string;
 
 	constructor(message: string, statusCode: number) {
 		super(message);

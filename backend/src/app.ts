@@ -8,11 +8,8 @@ import {
 import loginRouter from "./routes/loginRouter";
 import productRouter from "./routes/productRouter";
 import userRouter from "./routes/userRouter";
-import connectToMongo from "./utils/db";
 
 const app: Application = express();
-
-connectToMongo();
 
 app.use(express.json());
 app.use(requestLogger);

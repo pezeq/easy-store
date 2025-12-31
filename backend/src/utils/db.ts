@@ -1,6 +1,10 @@
 import mongoose from "mongoose";
 import { MONGODB_URL } from "./config";
 
+/**
+ * @deprecated
+ * Use kysele and postgres instead
+ */
 const connectToMongo = async (): Promise<void> => {
 	try {
 		await mongoose.connect(MONGODB_URL);

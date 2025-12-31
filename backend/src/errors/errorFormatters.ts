@@ -1,4 +1,5 @@
 import { MongooseError } from "mongoose";
+import { DatabaseError } from "pg";
 import type { AppError } from "../errors/AppError";
 
 interface ErrorResponse {
@@ -11,6 +12,8 @@ interface ErrorResponse {
 interface ErrorLog extends ErrorResponse {
 	isOperational?: boolean | undefined;
 	stack?: string | undefined;
+	type: string;
+	code: number | string | undefined;
 }
 
 export const formatErrorLog = (err: AppError): ErrorLog => {
@@ -20,6 +23,8 @@ export const formatErrorLog = (err: AppError): ErrorLog => {
 		statusCode: err.statusCode,
 		isOperational: err.isOperational ? err.isOperational : false,
 		stack: err.stack,
+		type: err.constructor.name,
+		code: err.code,
 		timestamp: new Date().toISOString(),
 	};
 };
@@ -35,6 +40,7 @@ export const formatErrorResponse = (err: AppError): ErrorResponse => {
 			case "CastError":
 			case "MongoServerError":
 			case "ValidationError":
+			case "error":
 				return 400;
 			case "JsonWebTokenError":
 			case "TokenExpiredError":
@@ -59,7 +65,7 @@ export const formatErrorResponse = (err: AppError): ErrorResponse => {
 					return `Field '${field}' already exists with value '${value}'`;
 				}
 
-				return undefined;
+				return;
 			}
 			case "ValidationError": {
 				const VALIDATION_REGEX = /\b\w+: ([^,]+)(?=,|$)/g;
@@ -71,18 +77,50 @@ export const formatErrorResponse = (err: AppError): ErrorResponse => {
 					return `${validationError.length} invalid inputs: ${validationError.join(", ").replace(/\b\w+:\s*/g, "")}`;
 				}
 
-				return undefined;
+				return;
 			}
 			case "JsonWebTokenError":
 				return "Your request has a invalid token";
 			case "TokenExpiredError":
 				return "Your token has been expired";
+			case "error": {
+				if (!(err instanceof DatabaseError)) {
+					return fallbackError.message;
+				}
+
+				const parts = err.constraint?.split("_");
+
+				if (!parts) return fallbackError.message;
+
+				const message = {
+					"23505": `Field '${parts[1]}' must be unique`,
+					"23514": `Field '${parts[1]}' is malformated`,
+				};
+
+				const { code } = err;
+
+				return message[code as keyof typeof code];
+			}
 			default:
-				return undefined;
+				return;
 		}
 	};
 
-	const name = err.name ?? fallbackError.name;
+	const mapErrorName = (err: AppError): string | undefined => {
+		switch (err.name) {
+			case "error": {
+				if (!(err instanceof DatabaseError)) {
+					return fallbackError.name;
+				}
+
+				return "ValidationError";
+			}
+			default:
+				return;
+		}
+	};
+
+	const name = mapErrorName(err) ?? err.name ?? fallbackError.name;
 	const statusCode = err.statusCode ?? mapErrorStatus(err);
 	const message = mapErrorMsg(err) ?? err.message ?? fallbackError.message;
 

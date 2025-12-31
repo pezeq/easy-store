@@ -1,39 +1,49 @@
 import bcrypt from "bcrypt";
-import User, { type IUser } from "../models/userModel";
+import type { DeleteResult } from "kysely";
+import {
+	deleteAllUsers,
+	deleteUserById,
+	findAllUsers,
+	findUserById,
+	insertUser,
+} from "../repositories/userRepository";
+import type { NewUser, User } from "../types/kyselyTypes";
 import { SALT_ROUND } from "../utils/config";
 
-const getAll = (): Promise<IUser[]> => {
-	return User.find({});
+const getAll = (): Promise<Partial<User>[] | undefined> => {
+	return findAllUsers();
 };
 
-const getOne = (id: string): Promise<IUser | null> => {
-	return User.findById({ _id: id });
+const getOne = (id: string): Promise<Partial<User> | undefined> => {
+	return findUserById(id);
 };
 
-const createNew = async (user: Partial<IUser>): Promise<IUser> => {
-	const { name, username, email, password } = user;
+const createNew = async (
+	user: Partial<User> & { password: string }
+): Promise<Partial<User>> => {
+	const { name, username, email, phone_number, password } = user;
 
-	const passwordHash = await bcrypt.hash(password as string, SALT_ROUND);
+	const password_hash = await bcrypt.hash(password as string, SALT_ROUND);
 
-	const newUser = new User({
+	const newUser = await insertUser({
 		name,
 		username,
 		email,
-		passwordHash,
-	});
+		phone_number,
+		password_hash,
+	} as NewUser);
 
-	return newUser.save();
+	console.log(newUser);
+
+	return newUser;
 };
 
-const deleteOne = (id: string): Promise<IUser | null> => {
-	return User.findByIdAndDelete({ _id: id });
+const deleteOne = (id: string): Promise<DeleteResult> => {
+	return deleteUserById(id);
 };
 
-const deleteAll = (): Promise<{
-	acknowledged: boolean;
-	deletedCount: number;
-}> => {
-	return User.deleteMany({});
+const deleteAll = (): Promise<DeleteResult> => {
+	return deleteAllUsers();
 };
 
 export default {
