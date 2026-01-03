@@ -12,11 +12,6 @@ const getOne = async (req: Request, res: Response): Promise<void> => {
 	res.status(200).json(user);
 };
 
-const createNew = async (req: Request, res: Response): Promise<void> => {
-	const user = await userService.createNew(req.body);
-	res.status(201).json(user);
-};
-
 const deleteOne = async (req: Request, res: Response): Promise<void> => {
 	const id = req.params.id as string;
 	await userService.deleteOne(id);
@@ -31,7 +26,6 @@ const deleteAll = async (_req: Request, res: Response): Promise<void> => {
 export default {
 	getAll,
 	getOne,
-	createNew,
 	deleteOne,
 	deleteAll,
 };
