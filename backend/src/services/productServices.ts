@@ -1,30 +1,35 @@
-import Product, { type IProduct } from "../models/productModel";
+import type { UpdateResult } from "kysely";
+import {
+	deleteAllProducts,
+	deleteProductById,
+	findAllProducts,
+	findProductById,
+	insertProduct,
+} from "../repositories/productRepository";
+import type { NewProduct, ProductDTO } from "../types/productTypes";
 
-const getAll = (): Promise<IProduct[]> => {
-	return Product.find({});
+const getAll = (): Promise<ProductDTO[]> => {
+	return findAllProducts();
 };
 
-const getOne = (id: string): Promise<IProduct | null> => {
-	return Product.findById(id);
+const getOne = (id: string): Promise<ProductDTO> => {
+	return findProductById(id);
 };
 
-const createNew = (product: Partial<IProduct>): Promise<IProduct> => {
-	const newProduct = new Product({
+const createNew = (product: NewProduct): Promise<ProductDTO> => {
+	const newProduct = insertProduct({
 		...product,
 	});
 
-	return newProduct.save();
+	return newProduct;
 };
 
-const deleteOne = (id: string): Promise<IProduct | null> => {
-	return Product.findByIdAndDelete(id);
+const deleteOne = (id: string): Promise<UpdateResult> => {
+	return deleteProductById(id);
 };
 
-const deleteAll = (): Promise<{
-	acknowledged?: boolean;
-	deletedCount?: number;
-}> => {
-	return Product.deleteMany({});
+const deleteAll = (): Promise<UpdateResult> => {
+	return deleteAllProducts();
 };
 
 export default {

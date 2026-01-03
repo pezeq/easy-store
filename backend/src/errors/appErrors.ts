@@ -31,7 +31,7 @@ export class ValidationError extends AppError {
 	}
 }
 
-export class AuthenticationError extends AppError {
+export class AuthError extends AppError {
 	constructor(message: string = "Invalid authentication credentials") {
 		super(message, 401);
 	}

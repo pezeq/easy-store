@@ -1,14 +1,16 @@
 import jwt from "jsonwebtoken";
+import { NoResultError } from "kysely";
 import { DatabaseError } from "pg";
 import {
 	AppError,
-	AuthenticationError,
+	AuthError,
 	DuplicateResourceError,
 	InternalServerError,
+	NotFoundError,
 	ValidationError,
 } from "./appErrors";
 
-export const translatePostgresError = (err: DatabaseError): AppError => {
+const translatePostgresError = (err: DatabaseError): AppError => {
 	const field = err.constraint?.split("_")[1];
 
 	switch (err.code) {
@@ -23,14 +25,14 @@ export const translatePostgresError = (err: DatabaseError): AppError => {
 	}
 };
 
-export const translateJwtError = (
+const translateJwtError = (
 	err: jwt.JsonWebTokenError | jwt.TokenExpiredError
 ): AppError => {
 	switch (err.name) {
 		case "JsonWebTokenError":
-			return new AuthenticationError("Your request has a invalid token");
+			return new AuthError("Your request has a invalid token");
 		case "TokenExpiredError":
-			return new AuthenticationError("Your token has been expired");
+			return new AuthError("Your token has been expired");
 		default:
 			return new InternalServerError();
 	}
@@ -42,6 +44,8 @@ export const errorRewrapper = (err: unknown): AppError => {
 			return err as AppError;
 		case err instanceof DatabaseError:
 			return translatePostgresError(err as DatabaseError);
+		case err instanceof NoResultError:
+			return new NotFoundError();
 		case err instanceof jwt.JsonWebTokenError:
 		case err instanceof jwt.TokenExpiredError:
 			return translateJwtError(

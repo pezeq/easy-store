@@ -1,50 +1,69 @@
-import type { DeleteResult } from "kysely";
+import type { UpdateResult } from "kysely";
 import { db } from "../database";
-import type { NewUser, User } from "../types/kyselyTypes";
+import { type NewUser, type UserDTO, UserRole } from "../types/userTypes";
 
-const publicUserColumn = [
+const publicUserCols = [
 	"id",
 	"name",
 	"username",
 	"email",
-	"phone_number",
-	"created_at",
+	"phone_number as phoneNumber",
+	"created_at as createdAt",
 ] as const;
 
-export async function insertUser(user: NewUser): Promise<Partial<User>> {
+export async function insertUser(user: NewUser): Promise<UserDTO> {
 	return await db
 		.insertInto("users")
 		.values(user)
-		.returning(publicUserColumn)
+		.returning(publicUserCols)
 		.executeTakeFirstOrThrow();
 }
 
-export async function findUserById(
-	id: string
-): Promise<Partial<User> | undefined> {
+export async function findUserById(id: string): Promise<UserDTO> {
 	return await db
 		.selectFrom("users")
+		.select(publicUserCols)
 		.where("id", "=", id)
-		.select(publicUserColumn)
+		.where("deleted_at", "is", null)
 		.executeTakeFirstOrThrow();
 }
 
-export async function findAllUsers(): Promise<Partial<User>[] | undefined> {
+export async function fetchUserAuth(username: string): Promise<{
+	id: string;
+	username: string;
+	name: string | null;
+	passwordHash: string;
+}> {
 	return await db
-		.selectFrom("users") //
-		.select(publicUserColumn) //
+		.selectFrom("users")
+		.select(["id", "username", "name", "password_hash as passwordHash"])
+		.where("username", "=", username)
+		.where("deleted_at", "is", null)
+		.executeTakeFirstOrThrow();
+}
+
+export async function findAllUsers(): Promise<UserDTO[]> {
+	return await db
+		.selectFrom("users")
+		.select(publicUserCols)
+		.where("deleted_at", "is", null)
 		.execute();
 }
 
-export async function deleteUserById(id: string): Promise<DeleteResult> {
+export async function deleteUserById(id: string): Promise<UpdateResult> {
 	return await db
-		.deleteFrom("users") //
-		.where("id", "=", id) //
+		.updateTable("users")
+		.where("deleted_at", "is", null)
+		.where("id", "=", id)
+		.set("deleted_at", new Date())
 		.executeTakeFirst();
 }
 
-export async function deleteAllUsers(): Promise<DeleteResult> {
+export async function deleteAllUsers(): Promise<UpdateResult> {
 	return await db
-		.deleteFrom("users") //
+		.updateTable("users")
+		.where("deleted_at", "is", null)
+		.where("role", "!=", UserRole.ADMIN)
+		.set("deleted_at", new Date())
 		.executeTakeFirst();
 }

@@ -1,8 +1,8 @@
 import express, { type Application } from "express";
 import {
+	authHandler,
 	errorHandler,
 	requestLogger,
-	tokenExtractor,
 	unknownEndpoint,
 } from "./middlewares/index";
 import loginRouter from "./routes/loginRouter";
@@ -13,9 +13,11 @@ const app: Application = express();
 
 app.use(express.json());
 app.use(requestLogger);
-app.use(tokenExtractor);
 
 app.use("/api/login", loginRouter);
+
+app.use(authHandler);
+
 app.use("/api/products", productRouter);
 app.use("/api/users", userRouter);
 

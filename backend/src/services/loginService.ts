@@ -1,21 +1,21 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import User, { type IUser } from "../models/userModel";
+import { fetchUserAuth } from "../repositories/userRepository";
+import type { UserAuth } from "../types/userTypes";
 import { SECRET } from "../utils/config";
 
-export interface IAuthUser {
-	token: string;
-	id: string;
-	username: string;
-	name: string;
-}
-
-const login = async (user: Partial<IUser>): Promise<IAuthUser | undefined> => {
-	const { username, password } = user;
-
+const login = async (
+	username: string,
+	password: string
+): Promise<UserAuth | undefined> => {
 	if (!username || !password) return;
 
-	const fetchedUser: IUser | null = await User.findOne({ username });
+	const fetchedUser: {
+		id: string;
+		username: string;
+		name: string | null;
+		passwordHash: string;
+	} = await fetchUserAuth(username);
 
 	if (!fetchedUser?.passwordHash) return;
 
@@ -37,7 +37,7 @@ const login = async (user: Partial<IUser>): Promise<IAuthUser | undefined> => {
 			token,
 			id: fetchedUser.id as string,
 			username: fetchedUser.username,
-			name: fetchedUser.name,
+			name: fetchedUser.name as string,
 		};
 	}
 

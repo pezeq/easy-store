@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import type { DeleteResult } from "kysely";
+import type { UpdateResult } from "kysely";
 import {
 	deleteAllUsers,
 	deleteUserById,
@@ -7,20 +7,20 @@ import {
 	findUserById,
 	insertUser,
 } from "../repositories/userRepository";
-import type { NewUser, User } from "../types/kyselyTypes";
+import type { NewUser, UserDTO } from "../types/userTypes";
 import { SALT_ROUND } from "../utils/config";
 
-const getAll = (): Promise<Partial<User>[] | undefined> => {
+const getAll = (): Promise<UserDTO[]> => {
 	return findAllUsers();
 };
 
-const getOne = (id: string): Promise<Partial<User> | undefined> => {
+const getOne = (id: string): Promise<UserDTO> => {
 	return findUserById(id);
 };
 
 const createNew = async (
-	user: Partial<User> & { password: string }
-): Promise<Partial<User>> => {
+	user: NewUser & { password: string }
+): Promise<UserDTO> => {
 	const { name, username, email, phone_number, password } = user;
 
 	const password_hash = await bcrypt.hash(password as string, SALT_ROUND);
@@ -33,16 +33,14 @@ const createNew = async (
 		password_hash,
 	} as NewUser);
 
-	console.log(newUser);
-
 	return newUser;
 };
 
-const deleteOne = (id: string): Promise<DeleteResult> => {
+const deleteOne = (id: string): Promise<UpdateResult> => {
 	return deleteUserById(id);
 };
 
-const deleteAll = (): Promise<DeleteResult> => {
+const deleteAll = (): Promise<UpdateResult> => {
 	return deleteAllUsers();
 };
 
