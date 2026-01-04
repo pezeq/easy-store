@@ -1,6 +1,8 @@
 import type { UpdateResult } from "kysely";
-import { db } from "../shared/database/database";
-import { type NewUser, type UserDTO, UserRole } from "../types/userTypes";
+import { db } from "../../shared/database/database";
+import type { InsertUser } from "../../shared/types/kysely.types";
+import { UserRole } from "../../shared/types/role.types";
+import type { UserDTO } from "./user.types";
 
 const publicUserCols = [
 	"id",
@@ -11,7 +13,7 @@ const publicUserCols = [
 	"created_at as createdAt",
 ] as const;
 
-export async function insertUser(user: NewUser): Promise<UserDTO> {
+export async function insertUser(user: InsertUser): Promise<UserDTO> {
 	return await db
 		.insertInto("users")
 		.values(user)

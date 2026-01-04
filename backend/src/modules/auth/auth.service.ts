@@ -1,8 +1,9 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { fetchUserAuth, insertUser } from "../../repositories/userRepository";
 import { SALT_ROUND, SECRET } from "../../shared/config/config";
-import type { NewUser, UserAuth, UserDTO } from "../../types/userTypes";
+import type { InsertUser } from "../../shared/types/kysely.types";
+import { fetchUserAuth, insertUser } from "../user/user.repository";
+import type { UserAuth, UserDTO } from "../user/user.types";
 
 const login = async (
 	username: string,
@@ -50,7 +51,7 @@ const signup = async ({
 	name,
 	email,
 	phone_number,
-}: NewUser & { password: string }): Promise<UserDTO> => {
+}: InsertUser & { password: string }): Promise<UserDTO> => {
 	const passwordHash = await bcrypt.hash(password as string, SALT_ROUND);
 
 	const signedUser = await insertUser({
@@ -59,7 +60,7 @@ const signup = async ({
 		name,
 		email,
 		phone_number,
-	} as NewUser);
+	} as InsertUser);
 
 	return signedUser;
 };

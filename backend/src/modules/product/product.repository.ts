@@ -1,6 +1,7 @@
 import type { UpdateResult } from "kysely";
-import { db } from "../shared/database/database";
-import type { NewProduct, ProductDTO } from "../types/productTypes";
+import { db } from "../../shared/database/database";
+import type { InsertProduct } from "../../shared/types/kysely.types";
+import type { ProductDTO } from "./product.types";
 
 const publicProductCols = [
 	"id",
@@ -16,7 +17,7 @@ const publicProductCols = [
 ] as const;
 
 export async function insertProduct(
-	newProduct: NewProduct
+	newProduct: InsertProduct
 ): Promise<ProductDTO> {
 	return await db
 		.insertInto("products")

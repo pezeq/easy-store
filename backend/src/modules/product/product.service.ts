@@ -1,12 +1,13 @@
 import type { UpdateResult } from "kysely";
+import type { InsertProduct } from "../../shared/types/kysely.types";
 import {
 	deleteAllProducts,
 	deleteProductById,
 	findAllProducts,
 	findProductById,
 	insertProduct,
-} from "../../repositories/productRepository";
-import type { NewProduct, ProductDTO } from "../../types/productTypes";
+} from "./product.repository";
+import type { ProductDTO } from "./product.types";
 
 const getAll = (): Promise<ProductDTO[]> => {
 	return findAllProducts();
@@ -16,7 +17,7 @@ const getOne = (id: string): Promise<ProductDTO> => {
 	return findProductById(id);
 };
 
-const createNew = (product: NewProduct): Promise<ProductDTO> => {
+const createNew = (product: InsertProduct): Promise<ProductDTO> => {
 	const newProduct = insertProduct({
 		...product,
 	});
