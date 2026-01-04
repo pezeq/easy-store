@@ -1,8 +1,8 @@
 import type { NextFunction, Request, Response } from "express";
 import jwt, { type JwtPayload } from "jsonwebtoken";
 import { findUserById } from "../../modules/user/user.repository";
-import { AuthError, NotFoundError } from "../../shared/errors/appErrors";
 import type { UserDTO } from "../../modules/user/user.types";
+import { AuthError, NotFoundError } from "../../shared/errors/appErrors";
 import { SECRET } from "../config/config";
 
 const userHasAuth = (token: string): JwtPayload => {
