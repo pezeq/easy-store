@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import { AuthError } from "../../errors/appErrors";
+import { AuthError } from "../../shared/errors/appErrors";
 import authService from "./auth.service";
 
 const login = async (req: Request, res: Response): Promise<void> => {

@@ -1,13 +1,13 @@
 import express, { type Application } from "express";
+import authRouter from "./modules/auth/auth.routes";
+import productRouter from "./modules/product/product.routes";
+import userRouter from "./modules/user/user.routes";
 import {
 	authHandler,
 	errorHandler,
 	requestLogger,
 	unknownEndpoint,
-} from "./middlewares/index";
-import authRouter from "./modules/auth/auth.routes";
-import productRouter from "./modules/product/product.routes";
-import userRouter from "./modules/user/user.routes";
+} from "./shared/middlewares/index";
 
 const app: Application = express();
 

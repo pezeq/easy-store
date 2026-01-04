@@ -1,8 +1,8 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { fetchUserAuth, insertUser } from "../../repositories/userRepository";
+import { SALT_ROUND, SECRET } from "../../shared/config/config";
 import type { NewUser, UserAuth, UserDTO } from "../../types/userTypes";
-import { SALT_ROUND, SECRET } from "../../utils/config";
 
 const login = async (
 	username: string,

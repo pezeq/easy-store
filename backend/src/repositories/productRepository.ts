@@ -1,5 +1,5 @@
 import type { UpdateResult } from "kysely";
-import { db } from "../database";
+import { db } from "../shared/database/database";
 import type { NewProduct, ProductDTO } from "../types/productTypes";
 
 const publicProductCols = [
