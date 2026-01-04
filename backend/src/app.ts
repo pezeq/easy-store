@@ -5,18 +5,16 @@ import {
 	requestLogger,
 	unknownEndpoint,
 } from "./middlewares/index";
-import loginRouter from "./routes/loginRouter";
-import productRouter from "./routes/productRouter";
-import signupRouter from "./routes/signupRouter";
-import userRouter from "./routes/userRouter";
+import authRouter from "./modules/auth/auth.routes";
+import productRouter from "./modules/product/product.routes";
+import userRouter from "./modules/user/user.routes";
 
 const app: Application = express();
 
 app.use(express.json());
 app.use(requestLogger);
 
-app.use("/api/login", loginRouter);
-app.use("/api/signup", signupRouter);
+app.use("/auth/", authRouter);
 
 app.use(authHandler);
 

@@ -1,8 +1,8 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { fetchUserAuth } from "../repositories/userRepository";
-import type { UserAuth } from "../types/userTypes";
-import { SECRET } from "../utils/config";
+import { fetchUserAuth, insertUser } from "../../repositories/userRepository";
+import type { NewUser, UserAuth, UserDTO } from "../../types/userTypes";
+import { SALT_ROUND, SECRET } from "../../utils/config";
 
 const login = async (
 	username: string,
@@ -44,6 +44,27 @@ const login = async (
 	return;
 };
 
+const signup = async ({
+	username,
+	password,
+	name,
+	email,
+	phone_number,
+}: NewUser & { password: string }): Promise<UserDTO> => {
+	const passwordHash = await bcrypt.hash(password as string, SALT_ROUND);
+
+	const signedUser = await insertUser({
+		username,
+		password_hash: passwordHash,
+		name,
+		email,
+		phone_number,
+	} as NewUser);
+
+	return signedUser;
+};
+
 export default {
 	login,
+	signup,
 };

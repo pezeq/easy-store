@@ -5,8 +5,8 @@ import {
 	findAllProducts,
 	findProductById,
 	insertProduct,
-} from "../repositories/productRepository";
-import type { NewProduct, ProductDTO } from "../types/productTypes";
+} from "../../repositories/productRepository";
+import type { NewProduct, ProductDTO } from "../../types/productTypes";
 
 const getAll = (): Promise<ProductDTO[]> => {
 	return findAllProducts();
