@@ -1,22 +1,8 @@
-import type { UpdateResult } from "kysely";
 import { db } from "../../shared/database/database";
 import type { InsertProduct } from "../../shared/types/kysely.types";
-import type { ProductDTO } from "./product.types";
+import { type ProductDTO, publicProductCols } from "./product.types";
 
-const publicProductCols = [
-	"id",
-	"name",
-	"sku",
-	"description",
-	"price",
-	"stock_quantity as stockQuantity",
-	"size",
-	"weight",
-	"brand_id as brandId",
-	"created_at as createdAt",
-] as const;
-
-export async function insertProduct(
+export async function createNewProduct(
 	newProduct: InsertProduct
 ): Promise<ProductDTO> {
 	return await db
@@ -26,7 +12,7 @@ export async function insertProduct(
 		.executeTakeFirstOrThrow();
 }
 
-export async function findProductById(id: string): Promise<ProductDTO> {
+export async function findProductById(id: number): Promise<ProductDTO> {
 	return await db
 		.selectFrom("products")
 		.select(publicProductCols)
@@ -43,8 +29,8 @@ export async function findAllProducts(): Promise<ProductDTO[]> {
 		.execute();
 }
 
-export async function deleteProductById(id: string): Promise<UpdateResult> {
-	return await db
+export async function deleteProductById(id: number): Promise<void> {
+	await db
 		.updateTable("products")
 		.where("id", "=", id)
 		.where("deleted_at", "is", null)
@@ -52,8 +38,8 @@ export async function deleteProductById(id: string): Promise<UpdateResult> {
 		.executeTakeFirst();
 }
 
-export async function deleteAllProducts(): Promise<UpdateResult> {
-	return await db
+export async function deleteAllProducts(): Promise<void> {
+	await db
 		.updateTable("products")
 		.where("deleted_at", "is", null)
 		.set("deleted_at", new Date())

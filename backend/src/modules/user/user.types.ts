@@ -1,7 +1,7 @@
 import type { UserRole } from "../../shared/types/role.types";
 
 export interface UserDTO {
-	id: string;
+	id: number;
 	name?: string | null;
 	username: string;
 	email: string;
@@ -13,9 +13,11 @@ export interface UserDTO {
 	deletedAt?: Date | null;
 }
 
-export interface UserAuth {
-	token: string;
-	id: string;
-	username: string;
-	name?: string;
-}
+export const publicUserCols = [
+	"id",
+	"name",
+	"username",
+	"email",
+	"phone_number as phoneNumber",
+	"created_at as createdAt",
+] as const;

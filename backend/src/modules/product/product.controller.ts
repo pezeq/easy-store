@@ -7,18 +7,28 @@ const getAll = async (_req: Request, res: Response): Promise<void> => {
 };
 
 const getOne = async (req: Request, res: Response): Promise<void> => {
-	const id = req.params.id as string;
+	const id = Number(req.params.id);
 	const product = await productServices.getOne(id);
 	res.status(200).json(product);
 };
 
 const createNew = async (req: Request, res: Response): Promise<void> => {
-	const newProduct = await productServices.createNew(req.body);
+	const { name, sku, description, price, stockQuantity, brandId } = req.body;
+
+	const newProduct = await productServices.createNew({
+		name,
+		sku,
+		description,
+		price,
+		stockQuantity,
+		brandId,
+	});
+
 	res.status(201).json(newProduct);
 };
 
 const deleteOne = async (req: Request, res: Response): Promise<void> => {
-	const id = req.params.id as string;
+	const id = Number(req.params.id);
 	await productServices.deleteOne(id);
 	res.status(204).end();
 };

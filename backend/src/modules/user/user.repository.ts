@@ -1,45 +1,12 @@
-import type { UpdateResult } from "kysely";
 import { db } from "../../shared/database/database";
-import type { InsertUser } from "../../shared/types/kysely.types";
 import { UserRole } from "../../shared/types/role.types";
-import type { UserDTO } from "./user.types";
+import { publicUserCols, type UserDTO } from "./user.types";
 
-const publicUserCols = [
-	"id",
-	"name",
-	"username",
-	"email",
-	"phone_number as phoneNumber",
-	"created_at as createdAt",
-] as const;
-
-export async function insertUser(user: InsertUser): Promise<UserDTO> {
-	return await db
-		.insertInto("users")
-		.values(user)
-		.returning(publicUserCols)
-		.executeTakeFirstOrThrow();
-}
-
-export async function findUserById(id: string): Promise<UserDTO> {
+export async function findUserById(id: number): Promise<UserDTO> {
 	return await db
 		.selectFrom("users")
 		.select(publicUserCols)
 		.where("id", "=", id)
-		.where("deleted_at", "is", null)
-		.executeTakeFirstOrThrow();
-}
-
-export async function fetchUserAuth(username: string): Promise<{
-	id: string;
-	username: string;
-	name: string | null;
-	passwordHash: string;
-}> {
-	return await db
-		.selectFrom("users")
-		.select(["id", "username", "name", "password_hash as passwordHash"])
-		.where("username", "=", username)
 		.where("deleted_at", "is", null)
 		.executeTakeFirstOrThrow();
 }
@@ -52,8 +19,8 @@ export async function findAllUsers(): Promise<UserDTO[]> {
 		.execute();
 }
 
-export async function deleteUserById(id: string): Promise<UpdateResult> {
-	return await db
+export async function deleteUserById(id: number): Promise<void> {
+	await db
 		.updateTable("users")
 		.where("deleted_at", "is", null)
 		.where("id", "=", id)
@@ -61,8 +28,8 @@ export async function deleteUserById(id: string): Promise<UpdateResult> {
 		.executeTakeFirst();
 }
 
-export async function deleteAllUsers(): Promise<UpdateResult> {
-	return await db
+export async function deleteAllUsers(): Promise<void> {
+	await db
 		.updateTable("users")
 		.where("deleted_at", "is", null)
 		.where("role", "!=", UserRole.ADMIN)

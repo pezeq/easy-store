@@ -1,22 +1,21 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { SALT_ROUND, SECRET } from "../../shared/config/config";
-import type { InsertUser } from "../../shared/types/kysely.types";
-import { fetchUserAuth, insertUser } from "../user/user.repository";
-import type { UserAuth, UserDTO } from "../user/user.types";
+import type { UserDTO } from "../user/user.types";
+import { createNewUser, fetchUserCredentials } from "./auth.repository";
+import type {
+	AuthenticadedUser,
+	UserCredentials,
+	UserSignUp,
+} from "./auth.types";
 
-const login = async (
-	username: string,
-	password: string
-): Promise<UserAuth | undefined> => {
+const login = async ({
+	username,
+	password,
+}: UserCredentials): Promise<AuthenticadedUser | undefined> => {
 	if (!username || !password) return;
 
-	const fetchedUser: {
-		id: string;
-		username: string;
-		name: string | null;
-		passwordHash: string;
-	} = await fetchUserAuth(username);
+	const fetchedUser = await fetchUserCredentials(username);
 
 	if (!fetchedUser?.passwordHash) return;
 
@@ -28,7 +27,7 @@ const login = async (
 	if (passwordMatches) {
 		const token = jwt.sign(
 			{
-				id: fetchedUser.id as string,
+				id: fetchedUser.id,
 				username: fetchedUser.username,
 			},
 			SECRET
@@ -36,9 +35,9 @@ const login = async (
 
 		return {
 			token,
-			id: fetchedUser.id as string,
+			id: fetchedUser.id,
 			username: fetchedUser.username,
-			name: fetchedUser.name as string,
+			name: fetchedUser.name,
 		};
 	}
 
@@ -50,17 +49,17 @@ const signup = async ({
 	password,
 	name,
 	email,
-	phone_number,
-}: InsertUser & { password: string }): Promise<UserDTO> => {
+	phoneNumber,
+}: UserSignUp): Promise<UserDTO> => {
 	const passwordHash = await bcrypt.hash(password as string, SALT_ROUND);
 
-	const signedUser = await insertUser({
+	const signedUser = await createNewUser({
 		username,
 		password_hash: passwordHash,
 		name,
 		email,
-		phone_number,
-	} as InsertUser);
+		phone_number: phoneNumber,
+	});
 
 	return signedUser;
 };

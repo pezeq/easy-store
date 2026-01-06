@@ -4,17 +4,25 @@ import authService from "./auth.service";
 
 const login = async (req: Request, res: Response): Promise<void> => {
 	const { username, password } = req.body;
-	const loggedUser = await authService.login(username, password);
 
-	if (loggedUser) {
-		res.status(200).json(loggedUser);
-	} else {
-		throw new AuthError();
-	}
+	const sessionUser = await authService.login({ username, password });
+
+	if (!sessionUser) throw new AuthError();
+
+	res.status(200).json(sessionUser);
 };
 
 const signup = async (req: Request, res: Response): Promise<void> => {
-	const signedUser = await authService.signup(req.body);
+	const { username, password, name, email, phoneNumber } = req.body;
+
+	const signedUser = await authService.signup({
+		username,
+		password,
+		name,
+		email,
+		phoneNumber,
+	});
+
 	res.status(201).json(signedUser);
 };
 

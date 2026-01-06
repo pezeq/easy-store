@@ -1,4 +1,3 @@
-import type { UpdateResult } from "kysely";
 import {
 	deleteAllUsers,
 	deleteUserById,
@@ -11,16 +10,16 @@ const getAll = (): Promise<UserDTO[]> => {
 	return findAllUsers();
 };
 
-const getOne = (id: string): Promise<UserDTO> => {
+const getOne = (id: number): Promise<UserDTO> => {
 	return findUserById(id);
 };
 
-const deleteOne = (id: string): Promise<UpdateResult> => {
-	return deleteUserById(id);
+const deleteOne = async (id: number): Promise<void> => {
+	await deleteUserById(id);
 };
 
-const deleteAll = (): Promise<UpdateResult> => {
-	return deleteAllUsers();
+const deleteAll = async (): Promise<void> => {
+	await deleteAllUsers();
 };
 
 export default {

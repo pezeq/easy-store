@@ -1,36 +1,46 @@
-import type { UpdateResult } from "kysely";
-import type { InsertProduct } from "../../shared/types/kysely.types";
 import {
+	createNewProduct,
 	deleteAllProducts,
 	deleteProductById,
 	findAllProducts,
 	findProductById,
-	insertProduct,
 } from "./product.repository";
-import type { ProductDTO } from "./product.types";
+import type { NewProduct, ProductDTO } from "./product.types";
 
 const getAll = (): Promise<ProductDTO[]> => {
 	return findAllProducts();
 };
 
-const getOne = (id: string): Promise<ProductDTO> => {
+const getOne = (id: number): Promise<ProductDTO> => {
 	return findProductById(id);
 };
 
-const createNew = (product: InsertProduct): Promise<ProductDTO> => {
-	const newProduct = insertProduct({
-		...product,
+const createNew = ({
+	name,
+	sku,
+	description,
+	price,
+	stockQuantity,
+	brandId,
+}: NewProduct): Promise<ProductDTO> => {
+	const newProduct = createNewProduct({
+		name,
+		sku,
+		description,
+		price,
+		stock_quantity: stockQuantity,
+		brand_id: brandId,
 	});
 
 	return newProduct;
 };
 
-const deleteOne = (id: string): Promise<UpdateResult> => {
-	return deleteProductById(id);
+const deleteOne = async (id: number): Promise<void> => {
+	await deleteProductById(id);
 };
 
-const deleteAll = (): Promise<UpdateResult> => {
-	return deleteAllProducts();
+const deleteAll = async (): Promise<void> => {
+	await deleteAllProducts();
 };
 
 export default {

@@ -1,9 +1,9 @@
-import type { UserDTO } from "./types/userTypes";
+import type { ReqUser } from "./modules/auth/auth.types";
 
 declare global {
 	namespace Express {
 		export interface Request {
-			user?: UserDTO;
+			user?: ReqUser;
 			token?: string;
 		}
 	}

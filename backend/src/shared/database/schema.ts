@@ -8,7 +8,7 @@ export interface Database {
 }
 
 export interface UsersTable {
-	id: Generated<string>;
+	id: Generated<number>;
 	name: string;
 	username: string;
 	email: string;
@@ -21,23 +21,20 @@ export interface UsersTable {
 }
 
 export interface ProductsTable {
-	id: Generated<string>;
+	id: Generated<number>;
 	name: string;
 	sku: string;
 	description: string | null;
 	price: number;
 	stock_quantity: number;
-	size: string | null;
-	weight: number | null;
-	brand_id: string;
-	cost_price: number | null;
+	brand_id: number;
 	created_at: Generated<Date>;
 	updated_at: Generated<Date>;
 	deleted_at: Date | null;
 }
 
 export interface BrandsTable {
-	id: Generated<string>;
+	id: Generated<number>;
 	name: string;
 	created_at: Generated<Date>;
 	updated_at: Generated<Date>;
