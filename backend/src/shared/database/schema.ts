@@ -1,5 +1,5 @@
 import type { Generated } from "kysely";
-import type { UserRole } from "../types/role.types";
+import type { UserRole } from "../types/role.types.js";
 
 export interface Database {
 	users: UsersTable;

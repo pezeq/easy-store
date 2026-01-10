@@ -1,7 +1,10 @@
 import type { NextFunction, Request, Response } from "express";
-import type { AppError } from "../errors/appErrors";
-import { formatErrorLog, formatErrorResponse } from "../errors/errorFormatters";
-import { errorRewrapper } from "../errors/errorTranslator";
+import type { AppError } from "../errors/appErrors.js";
+import {
+	formatErrorLog,
+	formatErrorResponse,
+} from "../errors/errorFormatters.js";
+import { errorRewrapper } from "../errors/errorTranslator.js";
 
 const errorHandler = (
 	err: AppError,

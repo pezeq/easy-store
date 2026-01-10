@@ -1,6 +1,6 @@
+import { asyncHandler } from "@shared/middlewares/index.js";
 import { Router } from "express";
-import { asyncHandler } from "../../shared/middlewares";
-import productController from "./product.controller";
+import productController from "./product.controller.js";
 
 const productRouter: Router = Router();
 

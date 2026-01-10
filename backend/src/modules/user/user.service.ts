@@ -3,8 +3,8 @@ import {
 	deleteUserById,
 	findAllUsers,
 	findUserById,
-} from "./user.repository";
-import type { UserDTO } from "./user.types";
+} from "./user.repository.js";
+import type { UserDTO } from "./user.types.js";
 
 const getAll = (): Promise<UserDTO[]> => {
 	return findAllUsers();

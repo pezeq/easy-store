@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import productServices from "./product.service";
+import productServices from "./product.service.js";
 
 const getAll = async (_req: Request, res: Response): Promise<void> => {
 	const products = await productServices.getAll();

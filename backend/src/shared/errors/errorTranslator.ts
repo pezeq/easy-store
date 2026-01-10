@@ -8,7 +8,7 @@ import {
 	InternalServerError,
 	NotFoundError,
 	ValidationError,
-} from "./appErrors";
+} from "./appErrors.js";
 
 const translatePostgresError = (err: DatabaseError): AppError => {
 	const field = err.constraint?.split("_")[1];

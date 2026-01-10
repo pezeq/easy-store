@@ -1,4 +1,4 @@
-import type { AppError } from "./appErrors";
+import type { AppError } from "./appErrors.js";
 
 interface ErrorResponse {
 	name: string;

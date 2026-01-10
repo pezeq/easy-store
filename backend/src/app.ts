@@ -1,14 +1,14 @@
-import express, { type Application } from "express";
-import authRouter from "./modules/auth/auth.routes";
-import cartRouter from "./modules/cart/cart.routes";
-import productRouter from "./modules/product/product.routes";
-import userRouter from "./modules/user/user.routes";
+import authRouter from "@modules/auth/auth.routes.js";
+import cartRouter from "@modules/cart/cart.routes.js";
+import productRouter from "@modules/product/product.routes.js";
+import userRouter from "@modules/user/user.routes.js";
 import {
 	authHandler,
 	errorHandler,
 	requestLogger,
 	unknownEndpoint,
-} from "./shared/middlewares/index";
+} from "@shared/middlewares/index.js";
+import express, { type Application } from "express";
 
 const app: Application = express();
 

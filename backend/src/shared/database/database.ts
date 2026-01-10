@@ -7,8 +7,8 @@ import {
 	DATABASE_PORT,
 	DATABASE_PW,
 	DATABASE_USER,
-} from "../config/config";
-import type { Database } from "./schema";
+} from "../config/config.js";
+import type { Database } from "./schema.js";
 
 const dialect: PostgresDialect = new PostgresDialect({
 	pool: new Pool({

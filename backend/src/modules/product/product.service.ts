@@ -1,4 +1,4 @@
-import { NotFoundError, ValidationError } from "../../shared/errors/appErrors";
+import { NotFoundError, ValidationError } from "@shared/errors/appErrors.js";
 import {
 	createNewProduct,
 	deleteAllProducts,
@@ -7,8 +7,8 @@ import {
 	findProductById,
 	getProductStockAndPrice,
 	updateProductStock,
-} from "./product.repository";
-import type { NewProduct, ProductDTO } from "./product.types";
+} from "./product.repository.js";
+import type { NewProduct, ProductDTO } from "./product.types.js";
 
 const getAll = (): Promise<ProductDTO[]> => {
 	return findAllProducts();

@@ -1,6 +1,6 @@
+import { AuthError } from "@shared/errors/appErrors.js";
 import type { Request, Response } from "express";
-import { AuthError } from "../../shared/errors/appErrors";
-import authService from "./auth.service";
+import authService from "./auth.service.js";
 
 const login = async (req: Request, res: Response): Promise<void> => {
 	const { username, password } = req.body;

@@ -1,6 +1,6 @@
-import { db } from "../../shared/database/database";
-import type { InsertProduct } from "../../shared/types/kysely.types";
-import { type ProductDTO, publicProductCols } from "./product.types";
+import { db } from "@shared/database/database.js";
+import type { InsertProduct } from "@shared/types/kysely.types.js";
+import { type ProductDTO, publicProductCols } from "./product.types.js";
 
 export async function createNewProduct(
 	newProduct: InsertProduct

@@ -1,6 +1,6 @@
+import { AuthError } from "@shared/errors/appErrors.js";
 import type { Request, Response } from "express";
-import { AuthError } from "../../shared/errors/appErrors";
-import cartService from "./cart.service";
+import cartService from "./cart.service.js";
 
 const getAll = async (_req: Request, res: Response): Promise<void> => {
 	const carts = await cartService.getAll();

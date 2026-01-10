@@ -1,8 +1,8 @@
+import { db } from "@shared/database/database.js";
+import type { SelectCart } from "@shared/types/kysely.types.js";
 import { sql, type UpdateResult } from "kysely";
-import { db } from "../../shared/database/database";
-import type { SelectCart } from "../../shared/types/kysely.types";
-import type { CartDTO, CartItemDTO } from "./cart.types";
-import { publicCartItemsCols } from "./cart.types";
+import type { CartDTO, CartItemDTO } from "./cart.types.js";
+import { publicCartItemsCols } from "./cart.types.js";
 
 export async function findAllCarts(): Promise<SelectCart[]> {
 	return await db

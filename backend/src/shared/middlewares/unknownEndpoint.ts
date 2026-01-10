@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
-import { NotFoundError } from "../errors/appErrors";
+import { NotFoundError } from "../errors/appErrors.js";
 
 const unknownEndpoint = (
 	req: Request,

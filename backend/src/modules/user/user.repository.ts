@@ -1,6 +1,6 @@
-import { db } from "../../shared/database/database";
-import { UserRole } from "../../shared/types/role.types";
-import { publicUserCols, type UserDTO } from "./user.types";
+import { db } from "@shared/database/database.js";
+import { UserRole } from "@shared/types/role.types.js";
+import { publicUserCols, type UserDTO } from "./user.types.js";
 
 export async function findUserById(id: number): Promise<UserDTO> {
 	return await db

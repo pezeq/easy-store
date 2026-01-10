@@ -1,9 +1,9 @@
+import { fetchReqUser } from "@modules/auth/auth.repository.js";
+import type { ReqUser } from "@modules/auth/auth.types.js";
 import type { NextFunction, Request, Response } from "express";
 import jwt, { type JwtPayload } from "jsonwebtoken";
-import { fetchReqUser } from "../../modules/auth/auth.repository";
-import type { ReqUser } from "../../modules/auth/auth.types";
-import { AuthError, NotFoundError } from "../../shared/errors/appErrors";
-import { SECRET } from "../config/config";
+import { SECRET } from "../config/config.js";
+import { AuthError, NotFoundError } from "../errors/appErrors.js";
 
 const userHasAuth = (token: string): JwtPayload => {
 	return jwt.verify(token, SECRET) as JwtPayload;

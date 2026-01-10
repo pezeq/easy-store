@@ -1,8 +1,8 @@
-import asyncHandler from "./asyncHandler";
-import authHandler from "./authHandler";
-import errorHandler from "./errorHandler";
-import requestLogger from "./requestLogger";
-import unknownEndpoint from "./unknownEndpoint";
+import asyncHandler from "./asyncHandler.js";
+import authHandler from "./authHandler.js";
+import errorHandler from "./errorHandler.js";
+import requestLogger from "./requestLogger.js";
+import unknownEndpoint from "./unknownEndpoint.js";
 
 export {
 	requestLogger,

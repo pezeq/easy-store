@@ -5,7 +5,7 @@ import type {
 	CartsTable,
 	ProductsTable,
 	UsersTable,
-} from "../database/schema";
+} from "../database/schema.js";
 
 export type SelectUser = Selectable<UsersTable>;
 export type InsertUser = Insertable<UsersTable>;

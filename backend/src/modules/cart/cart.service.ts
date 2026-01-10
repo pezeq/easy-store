@@ -1,9 +1,9 @@
-import { AppError, AuthError } from "../../shared/errors/appErrors";
-import type { SelectCart } from "../../shared/types/kysely.types";
+import { AppError, AuthError } from "@shared/errors/appErrors.js";
+import type { SelectCart } from "@shared/types/kysely.types.js";
 import {
 	getProductStockAndPrice,
 	updateProductStock,
-} from "../product/product.repository";
+} from "../product/product.repository.js";
 import {
 	addProductToCart,
 	addProuctQuantityInCart,
@@ -17,8 +17,8 @@ import {
 	getProductQuantityInCart,
 	removeProductFromCart,
 	updateProuctQuantityInCart,
-} from "./cart.repository";
-import type { CartItemDTO, FullCartDTO } from "./cart.types";
+} from "./cart.repository.js";
+import type { CartItemDTO, FullCartDTO } from "./cart.types.js";
 
 const getAll = async (): Promise<SelectCart[]> => {
 	return findAllCarts();

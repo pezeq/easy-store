@@ -1,13 +1,13 @@
+import { SALT_ROUND, SECRET } from "@shared/config/config.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { SALT_ROUND, SECRET } from "../../shared/config/config";
-import type { UserDTO } from "../user/user.types";
-import { createNewUser, fetchUserCredentials } from "./auth.repository";
+import type { UserDTO } from "../user/user.types.js";
+import { createNewUser, fetchUserCredentials } from "./auth.repository.js";
 import type {
 	AuthenticadedUser,
 	UserCredentials,
 	UserSignUp,
-} from "./auth.types";
+} from "./auth.types.js";
 
 const login = async ({
 	username,
