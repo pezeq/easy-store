@@ -5,6 +5,8 @@ export interface Database {
 	users: UsersTable;
 	products: ProductsTable;
 	brands: BrandsTable;
+	carts: CartsTable;
+	cart_items: CartItemsTable;
 }
 
 export interface UsersTable {
@@ -39,4 +41,23 @@ export interface BrandsTable {
 	created_at: Generated<Date>;
 	updated_at: Generated<Date>;
 	deleted_at: Date | null;
+}
+
+export interface CartsTable {
+	id: Generated<number>;
+	user_id: number;
+	created_at: Generated<Date>;
+	updated_at: Generated<Date>;
+	converted_at: Date | null;
+}
+
+export interface CartItemsTable {
+	id: Generated<number>;
+	cart_id: number;
+	product_id: number;
+	quantity: number;
+	unit_price: number;
+	total_price: number;
+	added_at: Generated<Date>;
+	removed_at: Date | null;
 }

@@ -29,4 +29,6 @@ export const publicProductCols = [
 	"stock_quantity as stockQuantity",
 	"brand_id as brandId",
 	"created_at as createdAt",
+	"updated_at as updatedAt",
+	"deleted_at as deletedAt",
 ] as const;

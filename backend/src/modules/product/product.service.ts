@@ -1,9 +1,12 @@
+import { NotFoundError, ValidationError } from "../../shared/errors/appErrors";
 import {
 	createNewProduct,
 	deleteAllProducts,
 	deleteProductById,
 	findAllProducts,
 	findProductById,
+	getProductStockAndPrice,
+	updateProductStock,
 } from "./product.repository";
 import type { NewProduct, ProductDTO } from "./product.types";
 
@@ -35,6 +38,24 @@ const createNew = ({
 	return newProduct;
 };
 
+const updateQuantity = async (
+	id: number,
+	quantity: number
+): Promise<ProductDTO> => {
+	const { stockQuantity } = await getProductStockAndPrice(id);
+
+	if (0 > stockQuantity + quantity) {
+		throw new ValidationError("Product quantity can not be negative");
+	}
+
+	const updatedProduct = await updateProductStock(id, quantity);
+
+	if (!updatedProduct)
+		throw new NotFoundError(`Product with id ${id} was not found!`);
+
+	return updatedProduct;
+};
+
 const deleteOne = async (id: number): Promise<void> => {
 	await deleteProductById(id);
 };
@@ -47,6 +68,7 @@ export default {
 	getAll,
 	getOne,
 	createNew,
+	updateQuantity,
 	deleteOne,
 	deleteAll,
 };

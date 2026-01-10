@@ -3,11 +3,7 @@ export class AppError extends Error {
 	readonly isOperational: boolean;
 	readonly code?: string | number | undefined;
 
-	protected constructor(
-		message: string,
-		statusCode: number,
-		code?: string | number
-	) {
+	constructor(message: string, statusCode: number, code?: string | number) {
 		super(message);
 
 		this.name = this.constructor.name;

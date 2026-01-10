@@ -27,6 +27,15 @@ const createNew = async (req: Request, res: Response): Promise<void> => {
 	res.status(201).json(newProduct);
 };
 
+const updateQuantity = async (req: Request, res: Response): Promise<void> => {
+	const id = Number(req.params.id);
+	const { quantity } = req.body;
+
+	const updatedProduct = await productServices.updateQuantity(id, quantity);
+
+	res.status(200).json(updatedProduct);
+};
+
 const deleteOne = async (req: Request, res: Response): Promise<void> => {
 	const id = Number(req.params.id);
 	await productServices.deleteOne(id);
@@ -42,6 +51,7 @@ export default {
 	getAll,
 	getOne,
 	createNew,
+	updateQuantity,
 	deleteOne,
 	deleteAll,
 };

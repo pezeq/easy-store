@@ -1,5 +1,6 @@
 import express, { type Application } from "express";
 import authRouter from "./modules/auth/auth.routes";
+import cartRouter from "./modules/cart/cart.routes";
 import productRouter from "./modules/product/product.routes";
 import userRouter from "./modules/user/user.routes";
 import {
@@ -20,6 +21,7 @@ app.use(authHandler);
 
 app.use("/api/products", productRouter);
 app.use("/api/users", userRouter);
+app.use("/api/carts", cartRouter);
 
 app.use(unknownEndpoint);
 app.use(errorHandler);

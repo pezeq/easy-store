@@ -45,3 +45,25 @@ export async function deleteAllProducts(): Promise<void> {
 		.set("deleted_at", new Date())
 		.executeTakeFirst();
 }
+
+export async function getProductStockAndPrice(
+	id: number
+): Promise<{ stockQuantity: number; unitPrice: number }> {
+	return await db
+		.selectFrom("products")
+		.select(["stock_quantity as stockQuantity", "price as unitPrice"])
+		.where("id", "=", id)
+		.executeTakeFirstOrThrow();
+}
+
+export async function updateProductStock(
+	id: number,
+	quantity: number
+): Promise<ProductDTO | undefined> {
+	return await db
+		.updateTable("products")
+		.set({ stock_quantity: quantity })
+		.returning(publicProductCols)
+		.where("id", "=", id)
+		.executeTakeFirst();
+}
