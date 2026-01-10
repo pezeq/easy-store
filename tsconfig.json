@@ -1,0 +1,34 @@
+{
+	"compilerOptions": {
+		/* Language level */
+		"target": "ES2024",
+		"lib": ["ES2024"],
+
+		/* Strictness & correctness */
+		"strict": true,
+		"noImplicitReturns": true,
+		"noUncheckedIndexedAccess": true,
+		"exactOptionalPropertyTypes": true,
+		"noUncheckedSideEffectImports": true,
+
+		/* Module semantics */
+		"module": "NodeNext",
+		"moduleResolution": "NodeNext",
+		"verbatimModuleSyntax": true,
+		"moduleDetection": "force",
+
+		/* Architecture */
+		"baseUrl": ".",
+		"paths": {
+			"@modules/*": ["backend/src/modules/*"],
+			"@shared/*": ["backend/src/shared/*"]
+		},
+
+		/* DX */
+		"sourceMap": true,
+		"declaration": true,
+		"declarationMap": true,
+		"skipLibCheck": true,
+		"allowSyntheticDefaultImports": true
+	}
+}
