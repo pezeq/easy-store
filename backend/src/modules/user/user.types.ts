@@ -1,4 +1,4 @@
-import type { UserRole } from "../../shared/types/role.types";
+import type { UserRole } from "@shared/types/role.types.js";
 
 export interface UserDTO {
 	id: number;
@@ -20,4 +20,6 @@ export const publicUserCols = [
 	"email",
 	"phone_number as phoneNumber",
 	"created_at as createdAt",
+	"updated_at as updatedAt",
+	"deleted_at as deletedAt",
 ] as const;

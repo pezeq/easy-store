@@ -1,5 +1,9 @@
 packages:
   - backend
 
+ignoredBuiltDependencies:
+  - unrs-resolver
+
 onlyBuiltDependencies:
+  - bcrypt
   - esbuild
