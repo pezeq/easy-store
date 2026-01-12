@@ -47,16 +47,7 @@ describe("User Service", () => {
 		},
 	];
 
-	const mockUser: UserDTO = {
-		id: 1,
-		name: "John Doe",
-		username: "johndoe",
-		email: "johndoe@email.com",
-		phoneNumber: "1234567890",
-		createdAt: new Date(),
-		updatedAt: new Date(),
-		deletedAt: null,
-	}
+	const mockUser = mockUsers[0] as UserDTO;
 
 	beforeEach(() => {
 		jest.clearAllMocks();
