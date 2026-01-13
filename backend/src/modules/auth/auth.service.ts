@@ -1,6 +1,6 @@
 import { SALT_ROUND, SECRET } from "@shared/config/config.js";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import * as bcrypt from "bcrypt";
+import * as jwt from "jsonwebtoken";
 import type { UserDTO } from "../user/user.types.js";
 import { createNewUser, fetchUserCredentials } from "./auth.repository.js";
 import type {
