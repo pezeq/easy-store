@@ -3,7 +3,7 @@ import type { ReqUser } from "@modules/auth/auth.types.js";
 import type { NextFunction, Request, Response } from "express";
 import jwt, { type JwtPayload } from "jsonwebtoken";
 import { SECRET } from "../config/config.js";
-import { AuthError, NotFoundError } from "../errors/appErrors.js";
+import { AuthError } from "../errors/appErrors.js";
 
 const userHasAuth = (token: string): JwtPayload => {
 	return jwt.verify(token, SECRET) as JwtPayload;
@@ -28,9 +28,9 @@ const authHandler = async (
 
 	if (!decoded.id) throw new AuthError("Your request has a invalid token");
 
-	const user: ReqUser = await fetchReqUser(decoded.id);
+	const user: ReqUser | undefined = await fetchReqUser(decoded.id);
 
-	if (!user) throw new NotFoundError("User does not exist");
+	if (!user) throw new AuthError();
 
 	req.user = user;
 

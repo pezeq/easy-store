@@ -8,6 +8,7 @@ export interface UserAuth {
 	username: string;
 	name: string;
 	passwordHash: string;
+	deletedAt: Date | null;
 }
 
 export interface AuthenticadedUser {

@@ -1,6 +1,7 @@
 import { SALT_ROUND, SECRET } from "@shared/config/config.js";
-import * as bcrypt from "bcrypt";
-import * as jwt from "jsonwebtoken";
+import { ForbiddenError } from "@shared/errors/appErrors.js";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 import type { UserDTO } from "../user/user.types.js";
 import { createNewUser, fetchUserCredentials } from "./auth.repository.js";
 import type {
@@ -16,6 +17,12 @@ const login = async ({
 	if (!username || !password) return;
 
 	const fetchedUser = await fetchUserCredentials(username);
+
+	if (fetchedUser?.deletedAt) {
+		throw new ForbiddenError(
+			"Your account has been deleted and cannot login"
+		);
+	}
 
 	if (!fetchedUser?.passwordHash) return;
 

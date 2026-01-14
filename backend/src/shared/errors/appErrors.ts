@@ -15,12 +15,6 @@ export class AppError extends Error {
 	}
 }
 
-export class NotFoundError extends AppError {
-	constructor(message: string = "Resource was not found") {
-		super(message, 404);
-	}
-}
-
 export class ValidationError extends AppError {
 	constructor(message: string = "Some of your input was invalid") {
 		super(message, 400);
@@ -30,6 +24,18 @@ export class ValidationError extends AppError {
 export class AuthError extends AppError {
 	constructor(message: string = "Invalid authentication credentials") {
 		super(message, 401);
+	}
+}
+
+export class ForbiddenError extends AppError {
+	constructor(message: string = "Insufficient permissions") {
+		super(message, 403);
+	}
+}
+
+export class NotFoundError extends AppError {
+	constructor(message: string = "Resource was not found") {
+		super(message, 404);
 	}
 }
 

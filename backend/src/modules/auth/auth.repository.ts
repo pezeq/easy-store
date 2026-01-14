@@ -13,20 +13,25 @@ export async function createNewUser(user: InsertUser): Promise<UserDTO> {
 
 export async function fetchUserCredentials(
 	username: string
-): Promise<UserAuth> {
+): Promise<UserAuth | undefined> {
 	return await db
 		.selectFrom("users")
-		.select(["id", "username", "name", "password_hash as passwordHash"])
+		.select([
+			"id",
+			"username",
+			"name",
+			"password_hash as passwordHash",
+			"deleted_at as deletedAt",
+		])
 		.where("username", "=", username)
-		.where("deleted_at", "is", null)
-		.executeTakeFirstOrThrow();
+		.executeTakeFirst();
 }
 
-export async function fetchReqUser(id: number): Promise<ReqUser> {
+export async function fetchReqUser(id: number): Promise<ReqUser | undefined> {
 	return await db
 		.selectFrom("users")
 		.select(["id", "username", "name"])
 		.where("id", "=", id)
 		.where("deleted_at", "is", null)
-		.executeTakeFirstOrThrow();
+		.executeTakeFirst();
 }

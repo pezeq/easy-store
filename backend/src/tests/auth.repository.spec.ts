@@ -1,15 +1,15 @@
 import { jest } from "@jest/globals";
 import type { ReqUser, UserAuth } from "@modules/auth/auth.types.js";
 import { publicUserCols, type UserDTO } from "@modules/user/user.types.js";
-import { NotFoundError } from "@shared/errors/appErrors.js";
+// import { NotFoundError } from "@shared/errors/appErrors.js";
 import type { InsertUser } from "@shared/types/kysely.types.js";
 
 interface SelectQuery {
 	where: jest.MockedFunction<
 		(column: string, operator: string, value: unknown) => SelectQuery
 	>;
-	executeTakeFirstOrThrow: jest.MockedFunction<
-		() => Promise<UserAuth | ReqUser>
+	executeTakeFirst: jest.MockedFunction<
+		() => Promise<UserAuth | ReqUser | undefined>
 	>;
 }
 
@@ -19,7 +19,7 @@ interface SelectBuilder {
 
 const selectQuery: SelectQuery = {
 	where: jest.fn(),
-	executeTakeFirstOrThrow: jest.fn(),
+	executeTakeFirst: jest.fn(),
 };
 
 selectQuery.where.mockReturnValue(selectQuery);
@@ -67,8 +67,8 @@ const {
 	fetchReqUser,
 }: {
 	createNewUser: (user: InsertUser) => Promise<UserDTO>;
-	fetchUserCredentials: (username: string) => Promise<UserAuth>;
-	fetchReqUser: (id: number) => Promise<ReqUser>;
+	fetchUserCredentials: (username: string) => Promise<UserAuth | undefined>;
+	fetchReqUser: (id: number) => Promise<ReqUser | undefined>;
 } = await import("@modules/auth/auth.repository.js");
 
 describe("Auth Repository", () => {
@@ -110,6 +110,7 @@ describe("Auth Repository", () => {
 		username: "johndoe",
 		name: "John Doe",
 		passwordHash: "123456790",
+		deletedAt: null,
 	};
 
 	const mockReqUser: ReqUser = {
@@ -140,7 +141,7 @@ describe("Auth Repository", () => {
 
 	describe("fetchUserCredentials", () => {
 		it("returns user credentials when the username exists", async () => {
-			selectQuery.executeTakeFirstOrThrow.mockResolvedValue(mockUserAuth);
+			selectQuery.executeTakeFirst.mockResolvedValue(mockUserAuth);
 
 			const result = await fetchUserCredentials(mockUserAuth.username);
 
@@ -150,37 +151,43 @@ describe("Auth Repository", () => {
 				"username",
 				"name",
 				"password_hash as passwordHash",
+				"deleted_at as deletedAt",
 			]);
 			expect(selectQuery.where).toHaveBeenCalledWith(
 				"username",
 				"=",
 				mockUserAuth.username
 			);
-			expect(selectQuery.where).toHaveBeenCalledWith(
-				"deleted_at",
-				"is",
-				null
-			);
-			expect(selectQuery.executeTakeFirstOrThrow).toHaveBeenCalledTimes(
-				1
-			);
+			expect(selectQuery.executeTakeFirst).toHaveBeenCalledTimes(1);
 			expect(result).toEqual(mockUserAuth);
 		});
 
-		it("throws NotFoundError when the username does not exist", async () => {
-			selectQuery.executeTakeFirstOrThrow.mockRejectedValue(
-				new NotFoundError()
-			);
+		it("returns undefined when the username does not exist", async () => {
+			selectQuery.executeTakeFirst.mockResolvedValue(undefined);
 
-			await expect(fetchUserCredentials("doesnt_exist")).rejects.toThrow(
-				NotFoundError
+			const result = await fetchUserCredentials("foobar");
+
+			expect(mockSelectFrom).toHaveBeenCalledWith("users");
+			expect(selectBuilder.select).toHaveBeenCalledWith([
+				"id",
+				"username",
+				"name",
+				"password_hash as passwordHash",
+				"deleted_at as deletedAt",
+			]);
+			expect(selectQuery.where).toHaveBeenCalledWith(
+				"username",
+				"=",
+				"foobar"
 			);
+			expect(selectQuery.executeTakeFirst).toHaveBeenCalledTimes(1);
+			expect(result).toEqual(undefined);
 		});
 	});
 
 	describe("fetchReqUser", () => {
 		it("returns the authenticated user for request context", async () => {
-			selectQuery.executeTakeFirstOrThrow.mockResolvedValue(mockReqUser);
+			selectQuery.executeTakeFirst.mockResolvedValue(mockReqUser);
 
 			const result = await fetchReqUser(mockReqUser.id);
 
@@ -200,18 +207,34 @@ describe("Auth Repository", () => {
 				"is",
 				null
 			);
-			expect(selectQuery.executeTakeFirstOrThrow).toHaveBeenCalledTimes(
-				1
-			);
+			expect(selectQuery.executeTakeFirst).toHaveBeenCalledTimes(1);
 			expect(result).toEqual(mockReqUser);
 		});
 
-		it("throws NotFoundError when the authenticated user is not found", async () => {
-			selectQuery.executeTakeFirstOrThrow.mockRejectedValue(
-				new NotFoundError()
-			);
+		it("returns undefined when the username does not exist", async () => {
+			selectQuery.executeTakeFirst.mockResolvedValue(undefined);
 
-			await expect(fetchReqUser(666)).rejects.toThrow(NotFoundError);
+			const result = await fetchReqUser(mockReqUser.id);
+
+			expect(mockSelectFrom).toHaveBeenCalledWith("users");
+			expect(selectBuilder.select).toHaveBeenCalledWith([
+				"id",
+				"username",
+				"name",
+			]);
+			expect(selectQuery.where).toHaveBeenCalledWith(
+				"id",
+				"=",
+				mockReqUser.id
+			);
+			expect(selectQuery.where).toHaveBeenCalledWith(
+				"deleted_at",
+				"is",
+				null
+			);
+			expect(selectQuery.executeTakeFirst).toHaveBeenCalledTimes(1);
+			expect(result).toEqual(undefined);
 		});
+
 	});
 });
