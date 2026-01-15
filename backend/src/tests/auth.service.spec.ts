@@ -53,12 +53,16 @@ const jwtSignMock: jest.Mock<
 > = jest.fn();
 
 jest.unstable_mockModule("bcrypt", () => ({
-	compare: bcryptCompareMock,
-	hash: bcryptHashMock,
+	default: {
+		compare: bcryptCompareMock,
+		hash: bcryptHashMock,
+	},
 }));
 
 jest.unstable_mockModule("jsonwebtoken", () => ({
-	sign: jwtSignMock,
+	default: {
+		sign: jwtSignMock,
+	},
 }));
 
 jest.unstable_mockModule("@modules/auth/auth.repository.js", () => ({
@@ -75,6 +79,7 @@ describe("Auth Service", () => {
 		username: "johndoe",
 		name: "John Doe",
 		passwordHash: "123456790",
+		deletedAt: null,
 	};
 
 	const mockAuthenticated: AuthenticadedUser = {

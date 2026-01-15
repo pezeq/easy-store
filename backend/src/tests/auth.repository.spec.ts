@@ -1,7 +1,6 @@
 import { jest } from "@jest/globals";
 import type { ReqUser, UserAuth } from "@modules/auth/auth.types.js";
 import { publicUserCols, type UserDTO } from "@modules/user/user.types.js";
-// import { NotFoundError } from "@shared/errors/appErrors.js";
 import type { InsertUser } from "@shared/types/kysely.types.js";
 
 interface SelectQuery {
@@ -235,6 +234,5 @@ describe("Auth Repository", () => {
 			expect(selectQuery.executeTakeFirst).toHaveBeenCalledTimes(1);
 			expect(result).toEqual(undefined);
 		});
-
 	});
 });

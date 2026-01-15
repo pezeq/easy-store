@@ -5,7 +5,6 @@ import {
 	deleteProductById,
 	findAllProducts,
 	findProductById,
-	getProductStockAndPrice,
 	updateProductStock,
 } from "./product.repository.js";
 import type { NewProduct, ProductDTO } from "./product.types.js";
@@ -42,16 +41,15 @@ const updateQuantity = async (
 	id: number,
 	quantity: number
 ): Promise<ProductDTO> => {
-	const { stockQuantity } = await getProductStockAndPrice(id);
-
-	if (0 > stockQuantity + quantity) {
-		throw new ValidationError("Product quantity can not be negative");
+	if (0 > quantity) {
+		throw new ValidationError("Product quantity cannot be negative");
 	}
 
 	const updatedProduct = await updateProductStock(id, quantity);
 
-	if (!updatedProduct)
+	if (!updatedProduct) {
 		throw new NotFoundError(`Product with id ${id} was not found!`);
+	}
 
 	return updatedProduct;
 };

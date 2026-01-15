@@ -63,7 +63,7 @@ export async function updateProductStock(
 	return await db
 		.updateTable("products")
 		.set({ stock_quantity: quantity })
-		.returning(publicProductCols)
 		.where("id", "=", id)
+		.returning(publicProductCols)
 		.executeTakeFirst();
 }
