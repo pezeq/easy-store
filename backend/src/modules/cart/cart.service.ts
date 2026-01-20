@@ -1,7 +1,11 @@
-import { AppError, AuthError } from "@shared/errors/appErrors.js";
-import type { SelectCart } from "@shared/types/kysely.types.js";
 import {
-	getProductStockAndPrice,
+	AuthError,
+	NotFoundError,
+	ValidationError,
+} from "@shared/errors/appErrors.js";
+import {
+	getProductPrice,
+	getProductStock,
 	updateProductStock,
 } from "../product/product.repository.js";
 import {
@@ -18,9 +22,9 @@ import {
 	removeProductFromCart,
 	updateProuctQuantityInCart,
 } from "./cart.repository.js";
-import type { CartItemDTO, FullCartDTO } from "./cart.types.js";
+import type { CartDTO, CartItemDTO, FullCartDTO } from "./cart.types.js";
 
-const getAll = async (): Promise<SelectCart[]> => {
+const getAll = async (): Promise<CartDTO[]> => {
 	return findAllCarts();
 };
 
@@ -39,7 +43,7 @@ const createNew = async (
 	quantity: number
 ): Promise<FullCartDTO> => {
 	const openCart = await findOpenCart(userId);
-	const cartId = openCart?.id ?? (await createNewCart(userId)).cartId;
+	const cartId = openCart?.id ?? (await createNewCart(userId)).id;
 
 	await addProduct(userId, cartId, productId, quantity);
 
@@ -58,29 +62,28 @@ const addProduct = async (
 		throw new AuthError("User does not own this cart.");
 	}
 
-	const { stockQuantity, unitPrice } =
-		await getProductStockAndPrice(productId);
+	const { stockQuantity } = await getProductStock(productId);
+	const { price } = await getProductPrice(productId);
 
 	if (quantity > stockQuantity) {
-		throw new AppError(
-			`Product with ID ${productId}, has ${stockQuantity} item(s) in stock.`,
-			400
+		throw new ValidationError(
+			`Product with ID ${productId}, has ${stockQuantity} item(s) in stock.`
 		);
 	}
 
-	const totalPrice = unitPrice * quantity;
+	const totalPrice = price * quantity;
 
 	const productsInCart = await getCartProducts(cartId);
 
 	const hasProduct = productsInCart?.some((p) => p.id === productId);
 
 	const cartItem = hasProduct
-		? await await addProuctQuantityInCart(cartId, productId, quantity)
+		? await addProuctQuantityInCart(cartId, productId, quantity)
 		: await addProductToCart(
 				cartId,
 				productId,
 				quantity,
-				unitPrice,
+				price,
 				totalPrice
 			);
 
@@ -97,6 +100,10 @@ export const updateQuantity = async (
 	productId: number,
 	quantity: number
 ): Promise<CartItemDTO | undefined> => {
+	if (quantity < 0) {
+		throw new ValidationError("Product quantity can not be negative");
+	}
+
 	const { ownerId } = await getCartOwnerId(cartId);
 
 	if (ownerId !== userId) {
@@ -108,23 +115,21 @@ export const updateQuantity = async (
 	const hasProduct = productsInCart?.some((p) => p.id === productId);
 
 	if (!hasProduct) {
-		throw new AppError(
-			`Product ID ${productId}, was not found in cart ID ${cartId}`,
-			404
+		throw new NotFoundError(
+			`Product ID ${productId}, was not found in cart ID ${cartId}`
 		);
 	}
 
-	if (!quantity) {
-		removeProduct(userId, cartId, productId);
+	if (quantity === 0) {
+		await removeProduct(userId, cartId, productId);
 		return;
 	}
 
-	const { stockQuantity } = await getProductStockAndPrice(productId);
+	const { stockQuantity } = await getProductStock(productId);
 
 	if (quantity > stockQuantity) {
-		throw new AppError(
-			`Product with ID ${productId}, has ${stockQuantity} item(s) in stock.`,
-			400
+		throw new ValidationError(
+			`Product with ID ${productId}, has ${stockQuantity} item(s) in stock.`
 		);
 	}
 
@@ -162,7 +167,7 @@ const removeProduct = async (
 		productId
 	);
 
-	const { stockQuantity } = await getProductStockAndPrice(productId);
+	const { stockQuantity } = await getProductStock(productId);
 
 	const updatedStock = quantityInCart + stockQuantity;
 

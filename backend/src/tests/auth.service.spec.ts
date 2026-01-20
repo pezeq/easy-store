@@ -145,7 +145,7 @@ describe("Auth Service", () => {
 				},
 				SECRET
 			);
-			expect(result).toEqual(undefined);
+			expect(result).toBeUndefined;
 		});
 	});
 

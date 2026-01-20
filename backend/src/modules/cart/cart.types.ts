@@ -19,6 +19,14 @@ export interface FullCartDTO extends CartDTO {
 	cartItems: CartItemDTO[];
 }
 
+export const publicCartCols = [
+	"id",
+	"user_id as userId",
+	"created_at as createdAt",
+	"updated_at as updatedAt",
+	"converted_at as convertedAt",
+] as const;
+
 export const publicCartItemsCols = [
 	"product_id as productId",
 	"quantity",

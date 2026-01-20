@@ -15,7 +15,9 @@ interface SelectQuery {
 		(column: string, operator: string, value: unknown) => SelectQuery
 	>;
 	executeTakeFirstOrThrow: jest.MockedFunction<
-		() => Promise<ProductDTO | { stockQuantity: number; unitPrice: number }>
+		() => Promise<
+			ProductDTO | { stockQuantity: number } | { price: number }
+		>
 	>;
 	execute: jest.MockedFunction<() => Promise<ProductDTO[] | undefined>>;
 }
@@ -98,7 +100,8 @@ const {
 	findAllProducts,
 	deleteProductById,
 	deleteAllProducts,
-	getProductStockAndPrice,
+	getProductPrice,
+	getProductStock,
 	updateProductStock,
 }: {
 	createNewProduct: (newProduct: InsertProduct) => Promise<ProductDTO>;
@@ -106,9 +109,8 @@ const {
 	findAllProducts: () => Promise<ProductDTO[]>;
 	deleteProductById: (id: number) => Promise<void>;
 	deleteAllProducts: () => Promise<void>;
-	getProductStockAndPrice: (
-		id: number
-	) => Promise<{ stockQuantity: number; unitPrice: number }>;
+	getProductPrice: (id: number) => Promise<{ price: number }>;
+	getProductStock: (id: number) => Promise<{ stockQuantity: number }>;
 	updateProductStock: (
 		id: number,
 		quantity: number
@@ -352,29 +354,23 @@ describe("Product Repository", () => {
 		});
 	});
 
-	describe("getProductStockAndPrice", () => {
+	describe("getProductPrice", () => {
 		it("returns the stock quantity and price for the given product", async () => {
-			const stockAndPrice = {
-				stockQuantity: 666,
-				unitPrice: 100,
+			const price = {
+				price: 100,
 			};
 
-			selectQuery.executeTakeFirstOrThrow.mockResolvedValue(
-				stockAndPrice
-			);
+			selectQuery.executeTakeFirstOrThrow.mockResolvedValue(price);
 
-			const result = await getProductStockAndPrice(1);
+			const result = await getProductPrice(1);
 
 			expect(mockSelectFrom).toHaveBeenCalledWith("products");
-			expect(selectBuilder.select).toHaveBeenCalledWith([
-				"stock_quantity as stockQuantity",
-				"price as unitPrice",
-			]);
+			expect(selectBuilder.select).toHaveBeenCalledWith(["price"]);
 			expect(selectQuery.where).toHaveBeenCalledWith("id", "=", 1);
 			expect(selectQuery.executeTakeFirstOrThrow).toHaveBeenCalledTimes(
 				1
 			);
-			expect(result).toEqual(stockAndPrice);
+			expect(result).toEqual(price);
 		});
 
 		it("throws NotFoundError when no product matches the given id", async () => {
@@ -382,13 +378,46 @@ describe("Product Repository", () => {
 				new NotFoundError()
 			);
 
-			await expect(getProductStockAndPrice(666)).rejects.toThrow(
-				NotFoundError
+			await expect(getProductPrice(666)).rejects.toThrow(NotFoundError);
+			expect(mockSelectFrom).toHaveBeenCalledWith("products");
+			expect(selectBuilder.select).toHaveBeenCalledWith(["price"]);
+			expect(selectQuery.where).toHaveBeenCalledWith("id", "=", 666);
+			expect(selectQuery.executeTakeFirstOrThrow).toHaveBeenCalledTimes(
+				1
 			);
+		});
+	});
+
+	describe("getProductStockAndPrice", () => {
+		it("returns the stock quantity and price for the given product", async () => {
+			const stock = {
+				stockQuantity: 666,
+			};
+
+			selectQuery.executeTakeFirstOrThrow.mockResolvedValue(stock);
+
+			const result = await getProductStock(1);
+
 			expect(mockSelectFrom).toHaveBeenCalledWith("products");
 			expect(selectBuilder.select).toHaveBeenCalledWith([
 				"stock_quantity as stockQuantity",
-				"price as unitPrice",
+			]);
+			expect(selectQuery.where).toHaveBeenCalledWith("id", "=", 1);
+			expect(selectQuery.executeTakeFirstOrThrow).toHaveBeenCalledTimes(
+				1
+			);
+			expect(result).toEqual(stock);
+		});
+
+		it("throws NotFoundError when no product matches the given id", async () => {
+			selectQuery.executeTakeFirstOrThrow.mockRejectedValue(
+				new NotFoundError()
+			);
+
+			await expect(getProductStock(666)).rejects.toThrow(NotFoundError);
+			expect(mockSelectFrom).toHaveBeenCalledWith("products");
+			expect(selectBuilder.select).toHaveBeenCalledWith([
+				"stock_quantity as stockQuantity",
 			]);
 			expect(selectQuery.where).toHaveBeenCalledWith("id", "=", 666);
 			expect(selectQuery.executeTakeFirstOrThrow).toHaveBeenCalledTimes(

@@ -46,12 +46,20 @@ export async function deleteAllProducts(): Promise<void> {
 		.executeTakeFirst();
 }
 
-export async function getProductStockAndPrice(
-	id: number
-): Promise<{ stockQuantity: number; unitPrice: number }> {
+export async function getProductPrice(id: number): Promise<{ price: number }> {
 	return await db
 		.selectFrom("products")
-		.select(["stock_quantity as stockQuantity", "price as unitPrice"])
+		.select(["price"])
+		.where("id", "=", id)
+		.executeTakeFirstOrThrow();
+}
+
+export async function getProductStock(
+	id: number
+): Promise<{ stockQuantity: number }> {
+	return await db
+		.selectFrom("products")
+		.select(["stock_quantity as stockQuantity"])
 		.where("id", "=", id)
 		.executeTakeFirstOrThrow();
 }

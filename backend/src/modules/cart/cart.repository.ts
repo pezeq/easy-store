@@ -1,26 +1,19 @@
 import { db } from "@shared/database/database.js";
-import type { SelectCart } from "@shared/types/kysely.types.js";
 import { sql, type UpdateResult } from "kysely";
 import type { CartDTO, CartItemDTO } from "./cart.types.js";
-import { publicCartItemsCols } from "./cart.types.js";
+import { publicCartCols, publicCartItemsCols } from "./cart.types.js";
 
-export async function findAllCarts(): Promise<SelectCart[]> {
+export async function findAllCarts(): Promise<CartDTO[]> {
 	return await db
 		.selectFrom("carts") //
-		.selectAll() //
+		.select(publicCartCols) //
 		.execute();
 }
 
 export async function findOneCart(id: number): Promise<CartDTO> {
 	return await db
 		.selectFrom("carts")
-		.select([
-			"id",
-			"user_id as userId",
-			"created_at as createdAt",
-			"updated_at as updatedAt",
-			"converted_at as convertedAt",
-		])
+		.select(publicCartCols)
 		.where("id", "=", id)
 		.executeTakeFirstOrThrow();
 }
@@ -75,13 +68,11 @@ export async function getProductQuantityInCart(
 		.executeTakeFirstOrThrow();
 }
 
-export async function createNewCart(
-	userId: number
-): Promise<{ cartId: number }> {
+export async function createNewCart(userId: number): Promise<{ id: number }> {
 	return await db
 		.insertInto("carts")
 		.values({ user_id: userId })
-		.returning(["id as cartId"])
+		.returning(["id"])
 		.executeTakeFirstOrThrow();
 }
 
