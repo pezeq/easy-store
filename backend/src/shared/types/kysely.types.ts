@@ -3,6 +3,7 @@ import type {
 	BrandsTable,
 	CartItemsTable,
 	CartsTable,
+	OrdersTable,
 	ProductsTable,
 	UsersTable,
 } from "../database/schema.js";
@@ -26,3 +27,7 @@ export type UpdateCart = Updateable<CartsTable>;
 export type SelectCartItem = Selectable<CartItemsTable>;
 export type InsertCartItem = Insertable<CartItemsTable>;
 export type UpdateCartItem = Updateable<CartItemsTable>;
+
+export type SelectOrder = Selectable<OrdersTable>;
+export type InsertOrder = Insertable<OrdersTable>;
+export type UpdateOrder = Updateable<OrdersTable>;

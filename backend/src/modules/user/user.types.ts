@@ -1,4 +1,4 @@
-import type { UserRole } from "@shared/types/role.types.js";
+import type { UserRole } from "@shared/types/custom.types.js";
 
 export interface UserDTO {
 	id: number;

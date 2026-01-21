@@ -1,5 +1,9 @@
 import type { Generated } from "kysely";
-import type { UserRole } from "../types/role.types.js";
+import type {
+	OrderStatus,
+	SalesChannel,
+	UserRole,
+} from "../types/custom.types.js";
 
 export interface Database {
 	users: UsersTable;
@@ -7,6 +11,7 @@ export interface Database {
 	brands: BrandsTable;
 	carts: CartsTable;
 	cart_items: CartItemsTable;
+	orders: OrdersTable;
 }
 
 export interface UsersTable {
@@ -60,4 +65,18 @@ export interface CartItemsTable {
 	total_price: number;
 	added_at: Generated<Date>;
 	removed_at: Date | null;
+}
+
+export interface OrdersTable {
+	id: Generated<number>;
+	cart_id: number;
+	channel: Generated<SalesChannel>;
+	status: Generated<OrderStatus>;
+	sub_total: number;
+	discount: number;
+	shipping_cost: number;
+	total: number;
+	created_at: Generated<Date>;
+	updated_at: Generated<Date>;
+	completed_at: Date | null;
 }
