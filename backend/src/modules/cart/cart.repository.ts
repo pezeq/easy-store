@@ -149,3 +149,12 @@ export async function removeProductFromCart(
 		.where("product_id", "=", productId)
 		.executeTakeFirstOrThrow();
 }
+
+export async function checkoutCart(id: number): Promise<CartDTO | undefined> {
+	return await db
+		.updateTable("carts")
+		.set({ converted_at: new Date() })
+		.where("id", "=", id)
+		.returning(publicCartCols)
+		.executeTakeFirst();
+}

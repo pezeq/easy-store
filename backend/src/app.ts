@@ -1,5 +1,6 @@
 import authRouter from "@modules/auth/auth.routes.js";
 import cartRouter from "@modules/cart/cart.routes.js";
+import orderRouter from "@modules/order/order.routes.js";
 import productRouter from "@modules/product/product.routes.js";
 import userRouter from "@modules/user/user.routes.js";
 import {
@@ -22,6 +23,7 @@ app.use(authHandler);
 app.use("/api/products", productRouter);
 app.use("/api/users", userRouter);
 app.use("/api/carts", cartRouter);
+app.use("/api/orders", orderRouter);
 
 app.use(unknownEndpoint);
 app.use(errorHandler);

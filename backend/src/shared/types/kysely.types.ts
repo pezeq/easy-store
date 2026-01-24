@@ -3,6 +3,7 @@ import type {
 	BrandsTable,
 	CartItemsTable,
 	CartsTable,
+	OrderStatusHistoryTable,
 	OrdersTable,
 	ProductsTable,
 	UsersTable,
@@ -31,3 +32,7 @@ export type UpdateCartItem = Updateable<CartItemsTable>;
 export type SelectOrder = Selectable<OrdersTable>;
 export type InsertOrder = Insertable<OrdersTable>;
 export type UpdateOrder = Updateable<OrdersTable>;
+
+export type SelectOSH = Selectable<OrderStatusHistoryTable>;
+export type InsertOSH = Insertable<OrderStatusHistoryTable>;
+export type UpdateOSH = Updateable<OrderStatusHistoryTable>;

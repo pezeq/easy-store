@@ -1,7 +1,7 @@
 import { jest } from "@jest/globals";
 import { publicUserCols, type UserDTO } from "@modules/user/user.types.js";
 import { NotFoundError } from "@shared/errors/appErrors.js";
-import { UserRole } from "@shared/types/role.types.js";
+import { UserRole } from "@shared/types/custom.types.js";
 
 interface SelectQuery {
 	where: jest.MockedFunction<

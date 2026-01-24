@@ -10,8 +10,11 @@ export enum SalesChannel {
 }
 
 export enum OrderStatus {
-	PENDING = "pending",
+	CREATED = "created",
 	PROCESSING = "processing",
+	PENDING = "pending",
+	PAID = "paid",
 	COMPLETED = "completed",
 	CANCELED = "canceled",
+	REFUNDED = "refunded",
 }

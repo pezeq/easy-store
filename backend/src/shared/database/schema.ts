@@ -12,6 +12,7 @@ export interface Database {
 	carts: CartsTable;
 	cart_items: CartItemsTable;
 	orders: OrdersTable;
+	order_status_history: OrderStatusHistoryTable;
 }
 
 export interface UsersTable {
@@ -71,7 +72,6 @@ export interface OrdersTable {
 	id: Generated<number>;
 	cart_id: number;
 	channel: Generated<SalesChannel>;
-	status: Generated<OrderStatus>;
 	sub_total: number;
 	discount: number;
 	shipping_cost: number;
@@ -79,4 +79,12 @@ export interface OrdersTable {
 	created_at: Generated<Date>;
 	updated_at: Generated<Date>;
 	completed_at: Date | null;
+}
+
+export interface OrderStatusHistoryTable {
+	id: Generated<number>;
+	order_id: number;
+	old_status: OrderStatus;
+	new_status: OrderStatus;
+	created_at: Generated<Date>;
 }
