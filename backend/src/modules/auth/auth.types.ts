@@ -13,9 +13,11 @@ export interface UserAuth {
 
 export interface AuthenticadedUser {
 	token: string;
-	id: number;
-	username: string;
-	name: string;
+	user: {
+		id: number;
+		username: string;
+		name: string | null | undefined;
+	};
 }
 
 export interface UserSignUp {
@@ -23,7 +25,7 @@ export interface UserSignUp {
 	password: string;
 	name: string;
 	email: string;
-	phoneNumber: string;
+	phoneNumber: string | undefined;
 }
 
 export interface ReqUser {

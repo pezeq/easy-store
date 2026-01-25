@@ -1,77 +1,78 @@
-import { SALT_ROUND, SECRET } from "@shared/config/config.js";
-import { ForbiddenError } from "@shared/errors/appErrors.js";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
-import type { UserDTO } from "../user/user.types.js";
+import { AuthError, ForbiddenError } from "@shared/errors/appErrors.js";
 import { createNewUser, fetchUserCredentials } from "./auth.repository.js";
 import type {
 	AuthenticadedUser,
 	UserCredentials,
 	UserSignUp,
 } from "./auth.types.js";
+import {
+	checkPasswordMatches,
+	generateToken,
+	hashPassword,
+} from "./auth.utils.js";
 
-const login = async ({
+export const login = async ({
 	username,
 	password,
-}: UserCredentials): Promise<AuthenticadedUser | undefined> => {
-	if (!username || !password) return;
-
+}: UserCredentials): Promise<AuthenticadedUser> => {
 	const fetchedUser = await fetchUserCredentials(username);
 
-	if (fetchedUser?.deletedAt) {
+	if (!fetchedUser) {
+		throw new AuthError();
+	}
+
+	if (fetchedUser.deletedAt) {
 		throw new ForbiddenError(
 			"Your account has been deleted and cannot login"
 		);
 	}
 
-	if (!fetchedUser?.passwordHash) return;
-
-	const passwordMatches = await bcrypt.compare(
-		password as string,
+	const passwordMatches = await checkPasswordMatches(
+		password,
 		fetchedUser.passwordHash
 	);
 
-	if (passwordMatches) {
-		const token = jwt.sign(
-			{
-				id: fetchedUser.id,
-				username: fetchedUser.username,
-			},
-			SECRET
-		);
+	if (!passwordMatches) {
+		throw new AuthError();
+	}
 
-		return {
-			token,
+	const token = generateToken(fetchedUser.id, fetchedUser.username);
+
+	return {
+		token,
+		user: {
 			id: fetchedUser.id,
 			username: fetchedUser.username,
 			name: fetchedUser.name,
-		};
-	}
-
-	return;
+		},
+	};
 };
 
-const signup = async ({
+export const signup = async ({
 	username,
 	password,
 	name,
 	email,
 	phoneNumber,
-}: UserSignUp): Promise<UserDTO> => {
-	const passwordHash = await bcrypt.hash(password as string, SALT_ROUND);
+}: UserSignUp): Promise<AuthenticadedUser> => {
+	const passwordHash = await hashPassword(password);
 
-	const signedUser = await createNewUser({
+	const newUser = await createNewUser({
 		username,
-		password_hash: passwordHash,
+		password: passwordHash,
 		name,
 		email,
-		phone_number: phoneNumber,
+		phoneNumber,
 	});
 
-	return signedUser;
-};
+	const token = generateToken(newUser.id, newUser.username);
 
-export default {
-	login,
-	signup,
+	return {
+		token,
+		user: {
+			id: newUser.id,
+			username: newUser.username,
+			name: newUser.name,
+		},
+	};
 };

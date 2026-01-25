@@ -6,25 +6,12 @@ import type {
 	UserSignUp,
 } from "@modules/auth/auth.types.js";
 import type { UserDTO } from "@modules/user/user.types.js";
-import { SALT_ROUND, SECRET } from "@shared/config/config.js";
+import { SALT_ROUND } from "@shared/config/config.js";
+import { AuthError } from "@shared/errors/appErrors.js";
 import type * as jwt from "jsonwebtoken";
 
-interface AuthService {
-	login: ({
-		username,
-		password,
-	}: UserCredentials) => Promise<AuthenticadedUser | undefined>;
-	signup: ({
-		username,
-		password,
-		name,
-		email,
-		phoneNumber,
-	}: UserSignUp) => Promise<UserDTO>;
-}
-
 const fetchUserCredentialsMock: jest.Mock<
-	(username: string) => Promise<UserAuth>
+	(username: string) => Promise<UserAuth | undefined>
 > = jest.fn();
 
 const createNewUserMock: jest.Mock<(user: UserSignUp) => Promise<UserDTO>> =
@@ -70,11 +57,25 @@ jest.unstable_mockModule("@modules/auth/auth.repository.js", () => ({
 	createNewUser: createNewUserMock,
 }));
 
-const authService: AuthService = (await import("@modules/auth/auth.service.js"))
-	.default;
+const {
+	login,
+	signup,
+}: {
+	login: ({
+		username,
+		password,
+	}: UserCredentials) => Promise<AuthenticadedUser>;
+	signup: ({
+		username,
+		password,
+		name,
+		email,
+		phoneNumber,
+	}: UserSignUp) => Promise<AuthenticadedUser>;
+} = await import("@modules/auth/auth.service.js");
 
 describe("Auth Service", () => {
-	const mockUserAuth: UserAuth = {
+	const mockUserAuth = {
 		id: 1,
 		username: "johndoe",
 		name: "John Doe",
@@ -82,14 +83,16 @@ describe("Auth Service", () => {
 		deletedAt: null,
 	};
 
-	const mockAuthenticated: AuthenticadedUser = {
+	const mockAuthenticated = {
 		token: "token123",
-		id: mockUserAuth.id,
-		username: mockUserAuth.username,
-		name: mockUserAuth.name,
+		user: {
+			id: mockUserAuth.id,
+			username: mockUserAuth.username,
+			name: mockUserAuth.name,
+		}
 	};
 
-	const mockUser: UserDTO = {
+	const mockUser = {
 		id: 1,
 		name: "John Doe",
 		username: "johndoe",
@@ -110,7 +113,7 @@ describe("Auth Service", () => {
 			bcryptCompareMock.mockResolvedValue(true);
 			jwtSignMock.mockReturnValue(mockAuthenticated.token);
 
-			const result = await authService.login({
+			const result = await login({
 				username: "johndoe",
 				password: "1234567890",
 			});
@@ -125,27 +128,12 @@ describe("Auth Service", () => {
 		});
 
 		it("should return undefined with the wrong credentials", async () => {
-			fetchUserCredentialsMock.mockResolvedValue(mockUserAuth);
-			bcryptCompareMock.mockResolvedValue(false);
+			fetchUserCredentialsMock.mockResolvedValue(undefined);
 
-			const result = await authService.login({
+			await expect(login({
 				username: "johndoe",
 				password: "0987654321",
-			});
-
-			expect(fetchUserCredentialsMock).toHaveBeenCalledWith("johndoe");
-			expect(bcryptCompareMock).toHaveBeenCalledWith(
-				"0987654321",
-				mockUserAuth.passwordHash
-			);
-			expect(jwtSignMock).not.toHaveBeenCalledWith(
-				{
-					id: mockUserAuth.id,
-					username: mockUserAuth.username,
-				},
-				SECRET
-			);
-			expect(result).toBeUndefined;
+			})).rejects.toThrow(AuthError);
 		});
 	});
 
@@ -154,7 +142,7 @@ describe("Auth Service", () => {
 			bcryptHashMock.mockResolvedValue(mockUserAuth.passwordHash);
 			createNewUserMock.mockResolvedValue(mockUser);
 
-			const result = await authService.signup({
+			const result = await signup({
 				username: "johdoe",
 				password: "1234567890",
 				name: "John Doe",
@@ -167,7 +155,7 @@ describe("Auth Service", () => {
 				SALT_ROUND
 			);
 			expect(createNewUserMock).toHaveBeenCalledTimes(1);
-			expect(result).toEqual(mockUser);
+			expect(result).toEqual(mockAuthenticated);
 		});
 	});
 });

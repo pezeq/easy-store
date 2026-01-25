@@ -1,12 +1,23 @@
 import { db } from "@shared/database/database.js";
-import type { InsertUser } from "@shared/types/kysely.types.js";
 import { publicUserCols, type UserDTO } from "../user/user.types.js";
-import type { ReqUser, UserAuth } from "./auth.types.js";
+import type { ReqUser, UserAuth, UserSignUp } from "./auth.types.js";
 
-export async function createNewUser(user: InsertUser): Promise<UserDTO> {
+export async function createNewUser({
+	username,
+	password,
+	name,
+	email,
+	phoneNumber,
+}: UserSignUp): Promise<UserDTO> {
 	return await db
 		.insertInto("users")
-		.values(user)
+		.values({
+			username,
+			password_hash: password,
+			name,
+			email,
+			phone_number: phoneNumber,
+		})
 		.returning(publicUserCols)
 		.executeTakeFirstOrThrow();
 }
