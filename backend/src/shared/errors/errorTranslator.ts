@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import { NoResultError } from "kysely";
 import { DatabaseError } from "pg";
+import { ZodError, z } from "zod";
 import {
 	AppError,
 	AuthError,
@@ -60,10 +61,28 @@ const translateJwtError = (
 	}
 };
 
+const translateZodError = (err: ZodError): AppError => {
+	const { fieldErrors } = z.flattenError(err);
+	const keys = Object.keys(fieldErrors);
+
+	if (!keys.length) {
+		throw new ValidationError();
+	}
+		
+	type errType = keyof typeof fieldErrors;
+	const errors: Array<string> = fieldErrors[keys[0] as errType];
+
+	return new ValidationError(
+		`${errors.join(", ")}`
+	);
+};
+
 export const errorRewrapper = (err: unknown): AppError => {
 	switch (true) {
 		case err instanceof AppError:
 			return err as AppError;
+		case err instanceof ZodError:
+			return translateZodError(err);
 		case err instanceof DatabaseError:
 			return translatePostgresError(err as DatabaseError);
 		case err instanceof NoResultError:
