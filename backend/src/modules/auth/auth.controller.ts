@@ -1,19 +1,19 @@
-import { AuthError } from "@shared/errors/appErrors.js";
+import { loginSchema, signupSchema } from "@modules/auth/auth.validation.js";
 import type { Request, Response } from "express";
-import authService from "./auth.service.js";
+import * as authService from "./auth.service.js";
 
-const login = async (req: Request, res: Response): Promise<void> => {
-	const { username, password } = req.body;
+export const login = async (req: Request, res: Response): Promise<void> => {
+	const { username, password } = loginSchema.parse(req.body);
 
 	const sessionUser = await authService.login({ username, password });
-
-	if (!sessionUser) throw new AuthError();
 
 	res.status(200).json(sessionUser);
 };
 
-const signup = async (req: Request, res: Response): Promise<void> => {
-	const { username, password, name, email, phoneNumber } = req.body;
+export const signup = async (req: Request, res: Response): Promise<void> => {
+	const { username, password, name, email, phoneNumber } = signupSchema.parse(
+		req.body
+	);
 
 	const signedUser = await authService.signup({
 		username,
@@ -24,9 +24,4 @@ const signup = async (req: Request, res: Response): Promise<void> => {
 	});
 
 	res.status(201).json(signedUser);
-};
-
-export default {
-	login,
-	signup,
 };
