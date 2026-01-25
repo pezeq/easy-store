@@ -8,10 +8,10 @@ import type {
 import type { ProductDTO } from "@modules/product/product.types.js";
 import {
 	AppError,
-	ValidationError,
 	AuthError,
 	InternalServerError,
 	NotFoundError,
+	ValidationError,
 } from "@shared/errors/appErrors.js";
 import { OrderStatus, SalesChannel } from "@shared/types/custom.types.js";
 

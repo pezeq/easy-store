@@ -1,6 +1,5 @@
 import { db } from "@shared/database/database.js";
 import { OrderStatus } from "@shared/types/custom.types.js";
-import { sql } from "kysely";
 import type { OrderDTO, OrderHistoryDTO } from "./order.types.js";
 import { publicOrderCols, publicOrderHistoryCols } from "./order.types.js";
 
