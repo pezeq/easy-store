@@ -89,7 +89,7 @@ describe("Auth Service", () => {
 			id: mockUserAuth.id,
 			username: mockUserAuth.username,
 			name: mockUserAuth.name,
-		}
+		},
 	};
 
 	const mockUser = {
@@ -130,10 +130,12 @@ describe("Auth Service", () => {
 		it("should return undefined with the wrong credentials", async () => {
 			fetchUserCredentialsMock.mockResolvedValue(undefined);
 
-			await expect(login({
-				username: "johndoe",
-				password: "0987654321",
-			})).rejects.toThrow(AuthError);
+			await expect(
+				login({
+					username: "johndoe",
+					password: "0987654321",
+				})
+			).rejects.toThrow(AuthError);
 		});
 	});
 

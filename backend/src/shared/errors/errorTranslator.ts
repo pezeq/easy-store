@@ -68,13 +68,11 @@ const translateZodError = (err: ZodError): AppError => {
 	if (!keys.length) {
 		throw new ValidationError();
 	}
-		
+
 	type errType = keyof typeof fieldErrors;
 	const errors: Array<string> = fieldErrors[keys[0] as errType];
 
-	return new ValidationError(
-		`${errors.join(", ")}`
-	);
+	return new ValidationError(`${errors.join(". ")}`);
 };
 
 export const errorRewrapper = (err: unknown): AppError => {
