@@ -5,6 +5,8 @@ declare global {
 		export interface Request {
 			user?: ReqUser;
 			token?: string;
+			validatedQuery: Record<string, T>;
+			validatedParams: Record<string, T>;
 		}
 	}
 }
