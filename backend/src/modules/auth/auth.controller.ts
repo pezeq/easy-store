@@ -1,9 +1,8 @@
-import { loginSchema, signupSchema } from "@modules/auth/auth.validation.js";
 import type { Request, Response } from "express";
 import * as authService from "./auth.service.js";
 
 export const login = async (req: Request, res: Response): Promise<void> => {
-	const { username, password } = loginSchema.parse(req.body);
+	const { username, password } = req.body;
 
 	const sessionUser = await authService.login({ username, password });
 
@@ -11,9 +10,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 };
 
 export const signup = async (req: Request, res: Response): Promise<void> => {
-	const { username, password, name, email, phoneNumber } = signupSchema.parse(
-		req.body
-	);
+	const { username, password, name, email, phoneNumber } = req.body;
 
 	const signedUser = await authService.signup({
 		username,
