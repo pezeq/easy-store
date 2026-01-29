@@ -1,8 +1,8 @@
 import type { NextFunction, Request, Response } from "express";
 import { TooManyRequestsError } from "../errors/appErrors.js";
 
-const FIVETEEN_MINUTES = 1 * 60 * 1000;
-const MAX_REQUESTS = 2;
+const FIFTEEN_MINUTES = 15 * 60 * 1000;
+const MAX_REQUESTS = 100;
 const CLEANUP_INTERVAL = 60 * 60 * 1000;
 
 interface RateLimitRecord {
@@ -15,7 +15,7 @@ const requestCount = new Map<string, RateLimitRecord>();
 setInterval(() => {
 	const now = Date.now();
 	for (const [ip, record] of requestCount) {
-		if (now - record.windowStart > FIVETEEN_MINUTES) {
+		if (now - record.windowStart > FIFTEEN_MINUTES) {
 			requestCount.delete(ip);
 		}
 	}
@@ -25,9 +25,15 @@ const rateLimiter = (req: Request, _res: Response, next: NextFunction) => {
 	const now = Date.now();
 	const ip = req.ip || req.socket.remoteAddress || "unknown";
 	const record = requestCount.get(ip);
-	const timeSinceWindowStart = now - (record?.windowStart ?? 0);
 
-	if (!record || timeSinceWindowStart > FIVETEEN_MINUTES) {
+	if (!record) {
+		requestCount.set(ip, { count: 1, windowStart: now });
+		return next();
+	}
+
+	const timeSinceWindowStart = now - record.windowStart;
+
+	if (timeSinceWindowStart > FIFTEEN_MINUTES) {
 		requestCount.set(ip, { count: 1, windowStart: now });
 		return next();
 	}
