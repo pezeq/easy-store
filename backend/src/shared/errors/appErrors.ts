@@ -45,6 +45,12 @@ export class DuplicateResourceError extends AppError {
 	}
 }
 
+export class TooManyRequestsError extends AppError {
+	constructor(message: string = "Too many request, please try again later.") {
+		super(message, 429);
+	}
+}
+
 export class InternalServerError extends AppError {
 	constructor(message: string = "Ooops... Something went wrong!") {
 		super(message, 500);
