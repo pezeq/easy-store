@@ -6,6 +6,7 @@ import userRouter from "@modules/user/user.routes.js";
 import {
 	authHandler,
 	errorHandler,
+	rateLimiter,
 	requestLogger,
 	unknownEndpoint,
 } from "@shared/middlewares/index.js";
@@ -15,6 +16,7 @@ const app: Application = express();
 
 app.use(express.json());
 app.use(requestLogger);
+app.use(rateLimiter);
 
 app.use("/auth/", authRouter);
 

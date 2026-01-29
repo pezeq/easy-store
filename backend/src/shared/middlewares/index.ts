@@ -4,6 +4,7 @@ import bodyValidation from "./bodyValidation.js";
 import errorHandler from "./errorHandler.js";
 import paramsValidation from "./paramsValidation.js";
 import queryValidation from "./queryValidation.js";
+import rateLimiter from "./rateLimiter.js";
 import requestLogger from "./requestLogger.js";
 import unknownEndpoint from "./unknownEndpoint.js";
 
@@ -16,4 +17,5 @@ export {
 	bodyValidation,
 	paramsValidation,
 	queryValidation,
+	rateLimiter,
 };
