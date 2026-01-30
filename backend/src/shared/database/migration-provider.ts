@@ -4,7 +4,6 @@ import { fileURLToPath } from "node:url";
 import { FileMigrationProvider, Migrator } from "kysely";
 import { db } from "./database.js";
 
-
 export function createMigrator(): Migrator {
 	const currentFilePath = fileURLToPath(import.meta.url);
 	const currentDir = path.dirname(currentFilePath);

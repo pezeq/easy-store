@@ -1,8 +1,6 @@
-import { fileURLToPath } from "node:url";
-import { db } from "./database.js";
-import { createMigrator } from "./migration-provider.js"
+import { createMigrator } from "./migration-provider.js";
 
-async function migrateToLatest(): Promise<void> {
+export async function migrateToLatest(): Promise<void> {
 	const migrator = createMigrator();
 
 	console.log("\nRunning migrations...");
@@ -28,7 +26,7 @@ async function migrateToLatest(): Promise<void> {
 	console.log("\nAll migrations completed successfully");
 }
 
-async function migrateDown(): Promise<void> {
+export async function migrateDown(): Promise<void> {
 	const migrator = createMigrator();
 
 	console.log("\nRolling back last migration...");
@@ -54,7 +52,7 @@ async function migrateDown(): Promise<void> {
 	console.log("\nRollback completed successfully");
 }
 
-async function migrateDownAll(): Promise<void> {
+export async function migrateDownAll(): Promise<void> {
 	const migrator = createMigrator();
 
 	console.log("\nRolling backk ALL migrations...");
@@ -93,7 +91,7 @@ async function migrateDownAll(): Promise<void> {
 	console.log(`\nRolled back ${migrationCount} migration(s) successfully!`);
 }
 
-async function getMigrationStatus(): Promise<void> {
+export async function getMigrationStatus(): Promise<void> {
 	const migrator = createMigrator();
 
 	const migrations = await migrator.getMigrations();
@@ -116,55 +114,4 @@ async function getMigrationStatus(): Promise<void> {
 	}
 
 	console.log("=".repeat(80));
-}
-
-async function main() {
-	const command = process.argv[2];
-
-	try {
-		switch (command) {
-			case "up":
-				await migrateToLatest();
-				break;
-			case "down":
-				await migrateDown();
-				break;
-			case "down:all":
-				await migrateDownAll();
-				break;
-			case "status":
-				await getMigrationStatus();
-				break;
-			default:
-				console.log(`
-Kysely Migration CLI
-
-Usage: 
-pnpm migrate <command>
-
-Commands:
-up            Run all pending migrations
-down          Rollback the last migration
-down:all      Rollback all migrations
-status        Show migration status
-
-Examples:
-pnpm migrate up
-pnpm migrate down
-pnpm migrate status
-                `);
-				break;
-		}
-
-		await db.destroy();
-	} catch (err) {
-		console.error(err);
-		process.exit(1);
-	}
-}
-
-const isMainModule = process.argv[1] === fileURLToPath(import.meta.url);
-
-if (isMainModule) {
-	main();
 }
