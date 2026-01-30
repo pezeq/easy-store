@@ -6,7 +6,8 @@
 	"scripts": {
 		"dev": "cross-env NODE_ENV=development tsx --watch src/server.ts",
 		"start": "cross-env NODE_ENV=production tsx src/server.ts",
-		"test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
+		"test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+		"migrate": "tsx src/shared/database/migrator.ts"
 	},
 	"dependencies": {
 		"bcrypt": "^6.0.0",
