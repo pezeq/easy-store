@@ -18,3 +18,13 @@ export enum OrderStatus {
 	CANCELED = "canceled",
 	REFUNDED = "refunded",
 }
+
+export interface Pagination<T> {
+	data: Array<T>;
+	meta: {
+		page: number;
+		pageSize: number;
+		totalItems: number;
+		totalPages: number;
+	};
+}
