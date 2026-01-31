@@ -11,12 +11,37 @@ export async function findUserById(id: number): Promise<UserDTO> {
 		.executeTakeFirstOrThrow();
 }
 
-export async function findAllUsers(): Promise<UserDTO[]> {
+export async function findAllUsers(
+	limit: number,
+	offset: number
+): Promise<{ users: UserDTO[]; count: number }> {
+	const [users, { count }] = await Promise.all([
+		db
+			.selectFrom("users")
+			.select(publicUserCols)
+			.limit(limit)
+			.offset(offset)
+			.execute(),
+
+		db
+			.selectFrom("users")
+			.select(db.fn.countAll().as("count"))
+			.executeTakeFirstOrThrow(),
+	]);
+
+	return {
+		users,
+		count: Number(count),
+	};
+}
+
+export async function getUserRoleById(id: number): Promise<{ role: UserRole }> {
 	return await db
 		.selectFrom("users")
-		.select(publicUserCols)
+		.select("role")
+		.where("id", "=", id)
 		.where("deleted_at", "is", null)
-		.execute();
+		.executeTakeFirstOrThrow();
 }
 
 export async function deleteUserById(id: number): Promise<void> {

@@ -1,31 +1,37 @@
+import { AuthError } from "@shared/errors/appErrors.js";
 import type { Request, Response } from "express";
-import userService from "./user.service.js";
+import * as userService from "./user.service.js";
 
-const getAll = async (_req: Request, res: Response): Promise<void> => {
-	const users = await userService.getAll();
+export const getAll = async (req: Request, res: Response): Promise<void> => {
+	const userId = req.user?.id;
+
+	if (!userId) {
+		throw new AuthError();
+	}
+
+	const { limit, offset } = req.validatedQuery;
+
+	const users = await userService.getAll(userId, limit, offset);
+
 	res.status(200).json(users);
 };
 
-const getOne = async (req: Request, res: Response): Promise<void> => {
+export const getOne = async (req: Request, res: Response): Promise<void> => {
 	const id = Number(req.params.id);
 	const user = await userService.getOne(id);
 	res.status(200).json(user);
 };
 
-const deleteOne = async (req: Request, res: Response): Promise<void> => {
+export const deleteOne = async (req: Request, res: Response): Promise<void> => {
 	const id = Number(req.params.id);
 	await userService.deleteOne(id);
 	res.status(204).end();
 };
 
-const deleteAll = async (_req: Request, res: Response): Promise<void> => {
+export const deleteAll = async (
+	_req: Request,
+	res: Response
+): Promise<void> => {
 	await userService.deleteAll();
 	res.status(204).end();
-};
-
-export default {
-	getAll,
-	getOne,
-	deleteOne,
-	deleteAll,
 };

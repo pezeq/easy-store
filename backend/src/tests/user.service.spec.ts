@@ -1,27 +1,58 @@
 import { jest } from "@jest/globals";
 import type { UserDTO } from "@modules/user/user.types.js";
+import { ForbiddenError } from "@shared/errors/appErrors.js";
+import type { Pagination } from "@shared/types/custom.types.js";
+import { UserRole } from "@shared/types/custom.types.js";
 
-interface UserService {
-	getAll: () => Promise<UserDTO[]>;
-	getOne: (id: number) => Promise<UserDTO>;
-	deleteOne: (id: number) => Promise<void>;
-	deleteAll: () => Promise<void>;
-}
-
-const findAllUsersMock: jest.Mock<() => Promise<UserDTO[]>> = jest.fn();
+const findAllUsersMock: jest.Mock<
+	(
+		limit: number,
+		offset: number
+	) => Promise<{ users: UserDTO[]; count: string | number | bigint }>
+> = jest.fn();
 const findUserByIdMock: jest.Mock<(id: number) => Promise<UserDTO>> = jest.fn();
 const deleteUserByIdMock: jest.Mock<(id: number) => Promise<void>> = jest.fn();
 const deleteAllUsersMock: jest.Mock<() => Promise<void>> = jest.fn();
+const getUserRoleByIdMock: jest.Mock<
+	(id: number) => Promise<{ role: UserRole }>
+> = jest.fn();
 
 jest.unstable_mockModule("@modules/user/user.repository.js", () => ({
 	findUserById: findUserByIdMock,
 	findAllUsers: findAllUsersMock,
 	deleteUserById: deleteUserByIdMock,
 	deleteAllUsers: deleteAllUsersMock,
+	getUserRoleById: getUserRoleByIdMock,
 }));
 
-const userService: UserService = (await import("@modules/user/user.service.js"))
-	.default;
+const paginationFormatterMock: jest.Mock<
+	<T>(
+		data: Array<T>,
+		count: string | number | bigint,
+		limit: number,
+		offset: number
+	) => Pagination<T>
+> = jest.fn();
+
+jest.unstable_mockModule("@shared/utils/paginationFormatter.js", () => ({
+	paginationFormatter: paginationFormatterMock,
+}));
+
+const {
+	getAll,
+	getOne,
+	deleteOne,
+	deleteAll,
+}: {
+	getAll: (
+		userId: number,
+		limit: number,
+		offset: number
+	) => Promise<Pagination<UserDTO>>;
+	getOne: (id: number) => Promise<UserDTO>;
+	deleteOne: (id: number) => Promise<void>;
+	deleteAll: () => Promise<void>;
+} = await import("@modules/user/user.service.js");
 
 describe("User Service", () => {
 	const mockUsers: UserDTO[] = [
@@ -49,18 +80,70 @@ describe("User Service", () => {
 
 	const mockUser = mockUsers[0] as UserDTO;
 
+	const mockPagination = {
+		data: mockUsers,
+		meta: {
+			page: 1,
+			pageSize: 20,
+			totalItems: 2,
+			totalPages: 1,
+		},
+	};
+
+	const limit = 20;
+	const offset = 0;
+
 	beforeEach(() => {
 		jest.clearAllMocks();
 	});
 
 	describe("getAll", () => {
-		it("should findAllUsers and return them", async () => {
-			findAllUsersMock.mockResolvedValue(mockUsers);
+		it("should return a paginated user list when called by an admin", async () => {
+			getUserRoleByIdMock.mockResolvedValue({ role: UserRole.ADMIN });
+			findAllUsersMock.mockResolvedValue({ users: mockUsers, count: 2 });
+			paginationFormatterMock.mockReturnValue(mockPagination);
 
-			const result = await userService.getAll();
+			const result = await getAll(mockUser.id, limit, offset);
 
-			expect(findAllUsersMock).toHaveBeenCalledTimes(1);
-			expect(result).toEqual(mockUsers);
+			expect(getUserRoleByIdMock).toHaveBeenCalledWith(mockUser.id);
+			expect(findAllUsersMock).toHaveBeenCalledWith(limit, offset);
+			expect(paginationFormatterMock).toHaveBeenCalledWith(
+				mockUsers,
+				2,
+				limit,
+				offset
+			);
+			expect(result).toEqual(mockPagination);
+		});
+
+		it("should return a paginated user list when called by a seller", async () => {
+			getUserRoleByIdMock.mockResolvedValue({ role: UserRole.SELLER });
+			findAllUsersMock.mockResolvedValue({ users: mockUsers, count: 2 });
+			paginationFormatterMock.mockReturnValue(mockPagination);
+
+			const result = await getAll(mockUser.id, limit, offset);
+
+			expect(getUserRoleByIdMock).toHaveBeenCalledWith(mockUser.id);
+			expect(findAllUsersMock).toHaveBeenCalledWith(limit, offset);
+			expect(paginationFormatterMock).toHaveBeenCalledWith(
+				mockUsers,
+				2,
+				limit,
+				offset
+			);
+			expect(result).toEqual(mockPagination);
+		});
+
+		it("should throw ForbiddenError when called by a customer", async () => {
+			getUserRoleByIdMock.mockResolvedValue({ role: UserRole.CUSTOMER });
+
+			await expect(getAll(mockUser.id, limit, offset)).rejects.toThrow(
+				ForbiddenError
+			);
+
+			expect(getUserRoleByIdMock).toHaveBeenCalledWith(mockUser.id);
+			expect(findAllUsersMock).not.toHaveBeenCalledWith();
+			expect(paginationFormatterMock).not.toHaveBeenCalled();
 		});
 	});
 
@@ -68,7 +151,7 @@ describe("User Service", () => {
 		it("should findUserById and return him", async () => {
 			findUserByIdMock.mockResolvedValue(mockUser);
 
-			const result = await userService.getOne(mockUser.id);
+			const result = await getOne(mockUser.id);
 
 			expect(findUserByIdMock).toHaveBeenCalledTimes(1);
 			expect(findUserByIdMock).toHaveBeenCalledWith(mockUser.id);
@@ -80,7 +163,7 @@ describe("User Service", () => {
 		it("should deleteUserById", async () => {
 			deleteUserByIdMock.mockResolvedValue(undefined);
 
-			await userService.deleteOne(mockUser.id);
+			await deleteOne(mockUser.id);
 
 			expect(deleteUserByIdMock).toHaveBeenCalledTimes(1);
 			expect(deleteUserByIdMock).toHaveBeenCalledWith(mockUser.id);
@@ -91,7 +174,7 @@ describe("User Service", () => {
 		it("should deleteAllUsers", async () => {
 			deleteAllUsersMock.mockResolvedValue(undefined);
 
-			await userService.deleteAll();
+			await deleteAll();
 
 			expect(deleteAllUsersMock).toHaveBeenCalledTimes(1);
 		});
