@@ -1,3 +1,5 @@
+import type { UserRole } from "@shared/types/custom.types.js";
+
 export interface UserCredentials {
 	username: string;
 	password: string;
@@ -32,4 +34,5 @@ export interface ReqUser {
 	id: number;
 	username: string;
 	name: string;
+	role: UserRole;
 }

@@ -41,7 +41,7 @@ export async function fetchUserCredentials(
 export async function fetchReqUser(id: number): Promise<ReqUser | undefined> {
 	return await db
 		.selectFrom("users")
-		.select(["id", "username", "name"])
+		.select(["id", "username", "name", "role"])
 		.where("id", "=", id)
 		.where("deleted_at", "is", null)
 		.executeTakeFirst();
