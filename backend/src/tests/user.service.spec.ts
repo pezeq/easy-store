@@ -1,4 +1,5 @@
 import { jest } from "@jest/globals";
+import type { ReqUser } from "@modules/auth/auth.types.js";
 import type { UserDTO } from "@modules/user/user.types.js";
 import { ForbiddenError } from "@shared/errors/appErrors.js";
 import type { Pagination } from "@shared/types/custom.types.js";
@@ -45,7 +46,7 @@ const {
 	deleteAll,
 }: {
 	getAll: (
-		userId: number,
+		user: ReqUser,
 		limit: number,
 		offset: number
 	) => Promise<Pagination<UserDTO>>;
@@ -80,6 +81,27 @@ describe("User Service", () => {
 
 	const mockUser = mockUsers[0] as UserDTO;
 
+	const mockReqUser: ReqUser[] = [
+		{
+			id: 3,
+			username: "admin",
+			name: "Admin",
+			role: UserRole.ADMIN,
+		},
+		{
+			id: 4,
+			username: "seller",
+			name: "Seller",
+			role: UserRole.SELLER,
+		},
+		{
+			id: 5,
+			username: "customer",
+			name: "Customer",
+			role: UserRole.CUSTOMER,
+		},
+	];
+
 	const mockPagination = {
 		data: mockUsers,
 		meta: {
@@ -99,13 +121,15 @@ describe("User Service", () => {
 
 	describe("getAll", () => {
 		it("should return a paginated user list when called by an admin", async () => {
-			getUserRoleByIdMock.mockResolvedValue({ role: UserRole.ADMIN });
 			findAllUsersMock.mockResolvedValue({ users: mockUsers, count: 2 });
 			paginationFormatterMock.mockReturnValue(mockPagination);
 
-			const result = await getAll(mockUser.id, limit, offset);
+			const result = await getAll(
+				mockReqUser[0] as ReqUser,
+				limit,
+				offset
+			);
 
-			expect(getUserRoleByIdMock).toHaveBeenCalledWith(mockUser.id);
 			expect(findAllUsersMock).toHaveBeenCalledWith(limit, offset);
 			expect(paginationFormatterMock).toHaveBeenCalledWith(
 				mockUsers,
@@ -117,13 +141,15 @@ describe("User Service", () => {
 		});
 
 		it("should return a paginated user list when called by a seller", async () => {
-			getUserRoleByIdMock.mockResolvedValue({ role: UserRole.SELLER });
 			findAllUsersMock.mockResolvedValue({ users: mockUsers, count: 2 });
 			paginationFormatterMock.mockReturnValue(mockPagination);
 
-			const result = await getAll(mockUser.id, limit, offset);
+			const result = await getAll(
+				mockReqUser[1] as ReqUser,
+				limit,
+				offset
+			);
 
-			expect(getUserRoleByIdMock).toHaveBeenCalledWith(mockUser.id);
 			expect(findAllUsersMock).toHaveBeenCalledWith(limit, offset);
 			expect(paginationFormatterMock).toHaveBeenCalledWith(
 				mockUsers,
@@ -137,11 +163,10 @@ describe("User Service", () => {
 		it("should throw ForbiddenError when called by a customer", async () => {
 			getUserRoleByIdMock.mockResolvedValue({ role: UserRole.CUSTOMER });
 
-			await expect(getAll(mockUser.id, limit, offset)).rejects.toThrow(
-				ForbiddenError
-			);
+			await expect(
+				getAll(mockReqUser[2] as ReqUser, limit, offset)
+			).rejects.toThrow(ForbiddenError);
 
-			expect(getUserRoleByIdMock).toHaveBeenCalledWith(mockUser.id);
 			expect(findAllUsersMock).not.toHaveBeenCalledWith();
 			expect(paginationFormatterMock).not.toHaveBeenCalled();
 		});
