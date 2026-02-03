@@ -50,7 +50,7 @@ const {
 		limit: number,
 		offset: number
 	) => Promise<Pagination<UserDTO>>;
-	getOne: (id: number) => Promise<UserDTO>;
+	getOne: (user: ReqUser, id: number) => Promise<UserDTO>;
 	deleteOne: (id: number) => Promise<void>;
 	deleteAll: () => Promise<void>;
 } = await import("@modules/user/user.service.js");
@@ -98,6 +98,12 @@ describe("User Service", () => {
 			id: 5,
 			username: "customer",
 			name: "Customer",
+			role: UserRole.CUSTOMER,
+		},
+		{
+			id: 1,
+			username: "johndoe",
+			name: "John Doe",
 			role: UserRole.CUSTOMER,
 		},
 	];
@@ -173,14 +179,45 @@ describe("User Service", () => {
 	});
 
 	describe("getOne", () => {
-		it("should findUserById and return him", async () => {
+		it("should fetch user and return when called by a admin", async () => {
 			findUserByIdMock.mockResolvedValue(mockUser);
 
-			const result = await getOne(mockUser.id);
+			const result = await getOne(mockReqUser[0] as ReqUser, mockUser.id);
 
-			expect(findUserByIdMock).toHaveBeenCalledTimes(1);
+			expect(findUserByIdMock).toHaveBeenCalled();
 			expect(findUserByIdMock).toHaveBeenCalledWith(mockUser.id);
 			expect(result).toEqual(mockUser);
+		});
+
+		it("should fetch user and return when called by a seller", async () => {
+			findUserByIdMock.mockResolvedValue(mockUser);
+
+			const result = await getOne(mockReqUser[1] as ReqUser, mockUser.id);
+
+			expect(findUserByIdMock).toHaveBeenCalled();
+			expect(findUserByIdMock).toHaveBeenCalledWith(mockUser.id);
+			expect(result).toEqual(mockUser);
+		});
+
+		it("should fetch user and return when called by himself", async () => {
+			findUserByIdMock.mockResolvedValue(mockUser);
+
+			const result = await getOne(mockReqUser[3] as ReqUser, mockUser.id);
+
+			expect(findUserByIdMock).toHaveBeenCalled();
+			expect(findUserByIdMock).toHaveBeenCalledWith(mockUser.id);
+			expect(result).toEqual(mockUser);
+		});
+
+		it("should throw ForbiddenError when called by another customer", async () => {
+			findUserByIdMock.mockResolvedValue(mockUser);
+
+			await expect(
+				getOne(mockReqUser[2] as ReqUser, mockUser.id)
+			).rejects.toThrow(ForbiddenError);
+
+			expect(findUserByIdMock).toHaveBeenCalled();
+			expect(findUserByIdMock).toHaveBeenCalledWith(mockUser.id);
 		});
 	});
 

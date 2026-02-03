@@ -1,7 +1,7 @@
 import type { ReqUser } from "@modules/auth/auth.types.js";
 import { ForbiddenError } from "@shared/errors/appErrors.js";
 import type { Pagination } from "@shared/types/custom.types.js";
-import { canList } from "@shared/utils/accessControl.js";
+import { canFetch, canList } from "@shared/utils/accessControl.js";
 import { paginationFormatter } from "@shared/utils/paginationFormatter.js";
 import {
 	deleteAllUsers,
@@ -25,8 +25,14 @@ export const getAll = async (
 	return paginationFormatter(users, count, limit, offset);
 };
 
-export const getOne = (id: number): Promise<UserDTO> => {
-	return findUserById(id);
+export const getOne = async (user: ReqUser, id: number): Promise<UserDTO> => {
+	const fetchedUser = await findUserById(id);
+
+	if (!canFetch.User(user, fetchedUser.id)) {
+		throw new ForbiddenError();
+	}
+
+	return fetchedUser;
 };
 
 export const deleteOne = async (id: number): Promise<void> => {
