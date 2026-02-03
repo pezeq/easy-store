@@ -17,9 +17,17 @@ export const getAll = async (req: Request, res: Response): Promise<void> => {
 };
 
 export const getOne = async (req: Request, res: Response): Promise<void> => {
-	const id = Number(req.params.id);
-	const user = await userService.getOne(id);
-	res.status(200).json(user);
+	const user = req.user;
+
+	if (!user) {
+		throw new AuthError();
+	}
+
+	const { id } = req.validatedParams;
+
+	const fetchedUser = await userService.getOne(user, id);
+
+	res.status(200).json(fetchedUser);
 };
 
 export const deleteOne = async (req: Request, res: Response): Promise<void> => {
