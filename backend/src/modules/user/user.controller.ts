@@ -3,15 +3,15 @@ import type { Request, Response } from "express";
 import * as userService from "./user.service.js";
 
 export const getAll = async (req: Request, res: Response): Promise<void> => {
-	const userId = req.user?.id;
+	const user = req.user;
 
-	if (!userId) {
+	if (!user) {
 		throw new AuthError();
 	}
 
 	const { limit, offset } = req.validatedQuery;
 
-	const users = await userService.getAll(userId, limit, offset);
+	const users = await userService.getAll(user, limit, offset);
 
 	res.status(200).json(users);
 };

@@ -1,23 +1,22 @@
+import type { ReqUser } from "@modules/auth/auth.types.js";
 import { ForbiddenError } from "@shared/errors/appErrors.js";
-import { type Pagination, UserRole } from "@shared/types/custom.types.js";
+import type { Pagination } from "@shared/types/custom.types.js";
+import { canList } from "@shared/utils/accessControl.js";
 import { paginationFormatter } from "@shared/utils/paginationFormatter.js";
 import {
 	deleteAllUsers,
 	deleteUserById,
 	findAllUsers,
 	findUserById,
-	getUserRoleById,
 } from "./user.repository.js";
 import type { UserDTO } from "./user.types.js";
 
 export const getAll = async (
-	userId: number,
+	user: ReqUser,
 	limit: number,
 	offset: number
 ): Promise<Pagination<UserDTO>> => {
-	const { role } = await getUserRoleById(userId);
-
-	if (role === UserRole.CUSTOMER) {
+	if (!canList.User(user)) {
 		throw new ForbiddenError();
 	}
 
