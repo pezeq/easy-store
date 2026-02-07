@@ -8,24 +8,36 @@ export const canList = {
 };
 
 export const canFetch = {
-	User: (user: ReqUser, ownerId: number) => {
+	User: (user: ReqUser, targetId: number) => {
 		return (
 			user.role === UserRole.ADMIN ||
 			user.role === UserRole.SELLER ||
-			user.id === ownerId
+			user.id === targetId
 		);
 	},
 };
 
 export const canUpdate = {
-	User: (user: ReqUser, ownerId: number) => {
-		return user.role === UserRole.ADMIN || user.id === ownerId;
+	User: (user: ReqUser, targetId: number) => {
+		return user.role === UserRole.ADMIN || user.id === targetId;
 	},
 };
 
 export const canRemove = {
-	User: (user: ReqUser, ownerId: number) => {
-		return user.role === UserRole.ADMIN || user.id === ownerId;
+	User: (user: ReqUser, targetId: number, targetRole: UserRole) => {
+		if (user.role === UserRole.ADMIN) {
+			return true;
+		}
+
+		if (targetRole === UserRole.SELLER) {
+			return false;
+		}
+
+		if (user.id === targetId) {
+			return true;
+		}
+
+		return false;
 	},
 };
 
