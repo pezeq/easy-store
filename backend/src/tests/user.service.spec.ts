@@ -51,7 +51,7 @@ const {
 		offset: number
 	) => Promise<Pagination<UserDTO>>;
 	getOne: (user: ReqUser, id: number) => Promise<UserDTO>;
-	deleteOne: (id: number) => Promise<void>;
+	deleteOne: (user: ReqUser, id: number) => Promise<void>;
 	deleteAll: () => Promise<void>;
 } = await import("@modules/user/user.service.js");
 
@@ -173,7 +173,7 @@ describe("User Service", () => {
 				getAll(mockReqUser[2] as ReqUser, limit, offset)
 			).rejects.toThrow(ForbiddenError);
 
-			expect(findAllUsersMock).not.toHaveBeenCalledWith();
+			expect(findAllUsersMock).not.toHaveBeenCalled();
 			expect(paginationFormatterMock).not.toHaveBeenCalled();
 		});
 	});
@@ -222,13 +222,115 @@ describe("User Service", () => {
 	});
 
 	describe("deleteOne", () => {
-		it("should deleteUserById", async () => {
-			deleteUserByIdMock.mockResolvedValue(undefined);
+		it("should delete an admin when called by another admin", async () => {
+			getUserRoleByIdMock.mockResolvedValue({ role: UserRole.ADMIN });
 
-			await deleteOne(mockUser.id);
+			await deleteOne(mockReqUser[0] as ReqUser, mockUser.id);
 
-			expect(deleteUserByIdMock).toHaveBeenCalledTimes(1);
+			expect(getUserRoleByIdMock).toHaveBeenCalledWith(mockUser.id);
 			expect(deleteUserByIdMock).toHaveBeenCalledWith(mockUser.id);
+		});
+
+		it("should delete a seller when called by an admin", async () => {
+			getUserRoleByIdMock.mockResolvedValue({ role: UserRole.SELLER });
+
+			await deleteOne(mockReqUser[0] as ReqUser, mockUser.id);
+
+			expect(getUserRoleByIdMock).toHaveBeenCalledWith(mockUser.id);
+			expect(deleteUserByIdMock).toHaveBeenCalledWith(mockUser.id);
+		});
+
+		it("should delete a customer when called by an admin", async () => {
+			getUserRoleByIdMock.mockResolvedValue({ role: UserRole.CUSTOMER });
+
+			await deleteOne(mockReqUser[0] as ReqUser, mockUser.id);
+
+			expect(getUserRoleByIdMock).toHaveBeenCalledWith(mockUser.id);
+			expect(deleteUserByIdMock).toHaveBeenCalledWith(mockUser.id);
+		});
+
+		it("should NOT delete an admin when called by a seller", async () => {
+			getUserRoleByIdMock.mockResolvedValue({ role: UserRole.ADMIN });
+
+			await expect(
+				deleteOne(mockReqUser[1] as ReqUser, mockUser.id)
+			).rejects.toThrow(ForbiddenError);
+
+			expect(getUserRoleByIdMock).toHaveBeenCalledWith(mockUser.id);
+			expect(deleteUserByIdMock).not.toHaveBeenCalled();
+		});
+
+		it("should NOT delete a seller when called by a seller", async () => {
+			getUserRoleByIdMock.mockResolvedValue({ role: UserRole.SELLER });
+
+			await expect(
+				deleteOne(mockReqUser[1] as ReqUser, mockUser.id)
+			).rejects.toThrow(ForbiddenError);
+
+			expect(getUserRoleByIdMock).toHaveBeenCalledWith(mockUser.id);
+			expect(deleteUserByIdMock).not.toHaveBeenCalled();
+		});
+
+		it("should NOT delete a customer when called by a seller", async () => {
+			getUserRoleByIdMock.mockResolvedValue({ role: UserRole.CUSTOMER });
+
+			await expect(
+				deleteOne(mockReqUser[1] as ReqUser, mockUser.id)
+			).rejects.toThrow(ForbiddenError);
+
+			expect(getUserRoleByIdMock).toHaveBeenCalledWith(mockUser.id);
+			expect(deleteUserByIdMock).not.toHaveBeenCalled();
+		});
+
+		it("should delete a customer when called by an admin", async () => {
+			getUserRoleByIdMock.mockResolvedValue({ role: UserRole.ADMIN });
+
+			await deleteOne(mockReqUser[0] as ReqUser, mockUser.id);
+
+			expect(getUserRoleByIdMock).toHaveBeenCalledWith(mockUser.id);
+			expect(deleteUserByIdMock).toHaveBeenCalledWith(mockUser.id);
+		});
+
+		it("should delete a customer when called by himself", async () => {
+			getUserRoleByIdMock.mockResolvedValue({ role: UserRole.CUSTOMER });
+
+			await deleteOne(mockReqUser[3] as ReqUser, mockUser.id);
+
+			expect(getUserRoleByIdMock).toHaveBeenCalledWith(mockUser.id);
+			expect(deleteUserByIdMock).toHaveBeenCalledWith(mockUser.id);
+		});
+
+		it("should NOT delete a customer when called by another customer", async () => {
+			getUserRoleByIdMock.mockResolvedValue({ role: UserRole.CUSTOMER });
+
+			await expect(
+				deleteOne(mockReqUser[2] as ReqUser, mockUser.id)
+			).rejects.toThrow(ForbiddenError);
+
+			expect(getUserRoleByIdMock).toHaveBeenCalledWith(mockUser.id);
+			expect(deleteUserByIdMock).not.toHaveBeenCalledWith();
+		});
+
+		it("should NOT delete an admin when called by a customer", async () => {
+			getUserRoleByIdMock.mockResolvedValue({ role: UserRole.ADMIN });
+
+			await expect(
+				deleteOne(mockReqUser[2] as ReqUser, mockUser.id)
+			).rejects.toThrow(ForbiddenError);
+
+			expect(getUserRoleByIdMock).toHaveBeenCalledWith(mockUser.id);
+			expect(deleteUserByIdMock).not.toHaveBeenCalledWith();
+		});
+
+		it("should NOT delete a seller when called by a customer", async () => {
+			getUserRoleByIdMock.mockResolvedValue({ role: UserRole.SELLER });
+
+			await expect(
+				deleteOne(mockReqUser[2] as ReqUser, mockUser.id)
+			).rejects.toThrow(ForbiddenError);
+
+			expect(getUserRoleByIdMock).toHaveBeenCalledWith(mockUser.id);
+			expect(deleteUserByIdMock).not.toHaveBeenCalledWith();
 		});
 	});
 

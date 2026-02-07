@@ -19,7 +19,11 @@ userRouter.get(
 	paramsValidation(idSchema),
 	asyncHandler(userController.getOne)
 );
-userRouter.delete("/:id", asyncHandler(userController.deleteOne));
+userRouter.delete(
+	"/:id",
+	paramsValidation(idSchema),
+	asyncHandler(userController.deleteOne)
+);
 userRouter.delete("/", asyncHandler(userController.deleteAll));
 
 export default userRouter;

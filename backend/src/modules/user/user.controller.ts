@@ -31,8 +31,15 @@ export const getOne = async (req: Request, res: Response): Promise<void> => {
 };
 
 export const deleteOne = async (req: Request, res: Response): Promise<void> => {
-	const id = Number(req.params.id);
-	await userService.deleteOne(id);
+	const reqUser = req.user;
+
+	if (!reqUser) {
+		throw new AuthError();
+	}
+
+	const { id: userIdToDelete } = req.validatedParams;
+
+	await userService.deleteOne(reqUser, userIdToDelete);
 	res.status(204).end();
 };
 
