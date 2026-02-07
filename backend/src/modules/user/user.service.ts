@@ -13,11 +13,11 @@ import {
 import type { UserDTO } from "./user.types.js";
 
 export const getAll = async (
-	user: ReqUser,
+	reqUser: ReqUser,
 	limit: number,
 	offset: number
 ): Promise<Pagination<UserDTO>> => {
-	if (!canList.User(user)) {
+	if (!canList.User(reqUser)) {
 		throw new ForbiddenError();
 	}
 
@@ -26,14 +26,15 @@ export const getAll = async (
 	return paginationFormatter(users, count, limit, offset);
 };
 
-export const getOne = async (user: ReqUser, id: number): Promise<UserDTO> => {
-	const fetchedUser = await findUserById(id);
-
-	if (!canFetch.User(user, fetchedUser.id)) {
+export const getOne = async (
+	reqUser: ReqUser,
+	userIdToFetch: number
+): Promise<UserDTO> => {
+	if (!canFetch.User(reqUser, userIdToFetch)) {
 		throw new ForbiddenError();
 	}
 
-	return fetchedUser;
+	return await findUserById(userIdToFetch);
 };
 
 export const deleteOne = async (

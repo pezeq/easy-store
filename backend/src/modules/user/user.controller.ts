@@ -1,45 +1,34 @@
-import { AuthError } from "@shared/errors/appErrors.js";
+import { getReqUser } from "@modules/auth/auth.utils.js";
 import type { Request, Response } from "express";
 import * as userService from "./user.service.js";
 
 export const getAll = async (req: Request, res: Response): Promise<void> => {
-	const user = req.user;
-
-	if (!user) {
-		throw new AuthError();
-	}
+	const reqUser = getReqUser(req);
 
 	const { limit, offset } = req.validatedQuery;
 
-	const users = await userService.getAll(user, limit, offset);
+	const fetchedUsers = await userService.getAll(reqUser, limit, offset);
 
-	res.status(200).json(users);
+	res.status(200).json(fetchedUsers);
 };
 
 export const getOne = async (req: Request, res: Response): Promise<void> => {
-	const user = req.user;
+	const reqUser = getReqUser(req);
 
-	if (!user) {
-		throw new AuthError();
-	}
+	const { id: userIdToFetch } = req.validatedParams;
 
-	const { id } = req.validatedParams;
-
-	const fetchedUser = await userService.getOne(user, id);
+	const fetchedUser = await userService.getOne(reqUser, userIdToFetch);
 
 	res.status(200).json(fetchedUser);
 };
 
 export const deleteOne = async (req: Request, res: Response): Promise<void> => {
-	const reqUser = req.user;
-
-	if (!reqUser) {
-		throw new AuthError();
-	}
+	const reqUser = getReqUser(req);
 
 	const { id: userIdToDelete } = req.validatedParams;
 
 	await userService.deleteOne(reqUser, userIdToDelete);
+	
 	res.status(204).end();
 };
 

@@ -216,8 +216,7 @@ describe("User Service", () => {
 				getOne(mockReqUser[2] as ReqUser, mockUser.id)
 			).rejects.toThrow(ForbiddenError);
 
-			expect(findUserByIdMock).toHaveBeenCalled();
-			expect(findUserByIdMock).toHaveBeenCalledWith(mockUser.id);
+			expect(findUserByIdMock).not.toHaveBeenCalled();
 		});
 	});
 
